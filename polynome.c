@@ -80,3 +80,8 @@ void affiche_polynome(Polynome* p) {
 
 /*il y a d'autre fonctions a implementer biensur*/
 
+// TODO fonction pour "detruire" un polynome (clear, kill, ...)
+// TODO Z/pZ plutot que les entiers:
+//  --> arithmetique (+ , - , * , inversion) dans Z/pZ, dans un fichier separe
+//  --> dans ce fichier ici, realiser les operations sur les coefficients dans Z/pZ
+
