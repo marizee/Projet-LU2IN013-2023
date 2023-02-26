@@ -5,22 +5,25 @@
 
 /*version naif*/
 
-Polynome* creer_polynome(int degre, char *indet){
+Polynome* creer_polynome(int degre, char indet){
     Polynome* p =(Polynome*)malloc(sizeof(Polynome));
     p->n = degre+1;
     p->coeff = (int*)malloc((degre+1)*sizeof(int));
-    p->indet = strdup(indet);
+    for (int i=0; i<degre+1; i++) {
+        p->coeff[i] = 0;
+    }
+    p->indet = indet;
     return p;
 }
 
 Polynome* initialiser_polynome(){
     int a; 
-    char var2[1];  
+    char var;  
     printf("Veuillez saisir \n- le degré de votre polynome:\t");
     scanf(" %d",&a);
     printf("- son indeterminée:\t");
-    scanf(" %c",var2);
-    Polynome* p = creer_polynome(a, var2);
+    scanf(" %c",&var);
+    Polynome* p = creer_polynome(a, var);
     printf("- ses coefficients:");
     for(int i=0; i<p->n; i++){
         printf("\t");
@@ -54,9 +57,8 @@ Polynome* addition(Polynome* p1, Polynome* p2) {
     return new_poly;
 }
 
-Polynome* multiplication(Polynome* p1, Polynome* p2) {
-    int degre_prod = p1->n+ p2->n;
-    Polynome* new_poly = creer_polynome(degre_prod-2,"X");
+Polynome* mult_naive(Polynome* p1, Polynome* p2) {
+    Polynome* new_poly = creer_polynome((p1->n+p2->n)-2,'X');
     for (int i=0; i<p1->n; i++) {
         for (int j=0; j<p2->n; j++) {
             new_poly->coeff[i+j] += p1->coeff[i]*p2->coeff[j];
@@ -80,7 +82,7 @@ void affiche_polynome(Polynome* p) {
 
 /*il y a d'autre fonctions a implementer biensur*/
 
-// TODO fonction pour "detruire" un polynome (clear, kill, ...)
+// TODO fonction pour "detruire" un polynome (clear, kill, ...) ok
 // TODO Z/pZ plutot que les entiers:
 //  --> arithmetique (+ , - , * , inversion) dans Z/pZ, dans un fichier separe
 //  --> dans ce fichier ici, realiser les operations sur les coefficients dans Z/pZ
