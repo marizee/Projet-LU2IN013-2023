@@ -7,6 +7,6 @@
 Polynome* addition(Polynome* p1, Polynome* p2);
 Polynome* soustraction(Polynome* p1, Polynome* p2);
 Polynome* mult_naive(Polynome* p1, Polynome* p2);
-Polynome* katsubara(Polynome* f, Polynome* g);
+Polynome* karatsuba(Polynome* f, Polynome* g);
 
 #endif
