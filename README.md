@@ -2,7 +2,7 @@
 
 SUR LES FICHIERS :
 - les fichiers "structure" contiennent ce qui est de la manipulation de la structure C Polynome (création, initialisation, affichage, destruction...)
-- les fichiers "polynome" contiennent les opérations +, - et multiplication (naïve et Katsubara) non modulaires
+- les fichiers "polynome" contiennent les opérations +, - et multiplication (naïve et Karatsuba) non modulaires
 
 _____________________________________________________________________________________________
 
