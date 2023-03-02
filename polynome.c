@@ -60,7 +60,7 @@ Polynome* mult_naive(Polynome* p1, Polynome* p2) {
     return new_poly;
 }
 
-Polynome* katsubara(Polynome* f, Polynome* g) {
+Polynome* karatsuba(Polynome* f, Polynome* g) {
     
     //cas d'arrêt
     if (f->n == 0) return f;
