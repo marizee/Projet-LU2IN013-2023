@@ -9,8 +9,9 @@ typedef struct _poly{
 Polynome* creer_polynome(int degre);
 void detruire_polynome(Polynome* p);
 Polynome* initialiser_polynome();
-Polynome* coeff_polynome(int coeff[], int taille);
+Polynome* coeff_to_polynome(int coeff[], int degre);
 void affiche_polynome(Polynome* p);
 void affiche_coeff(Polynome* p);
+void ajuste_degre(Polynome* p);
 
 #endif
