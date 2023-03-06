@@ -66,7 +66,7 @@ Polynome* mult_naive(Polynome* p1, Polynome* p2) {
 Polynome* karatsuba(Polynome* f, Polynome* g) {
 
     //si un des deux polynomes est nul, alors la multiplication est nulle
-    if (g->n <= 0 || g->n <= 0) return creer_polynome(-1);
+    if (f->n <= 0 || g->n <= 0) return creer_polynome(-1);
     
     //si un des deux polynomes est de degrÃ© 0, on utilise la multiplication naÃ¯ve
     if (f->n == 1 || g->n == 1) return mult_naive(f, g);
