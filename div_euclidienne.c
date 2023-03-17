@@ -4,7 +4,7 @@
 
 Polynome* division(Polynome* A,Polynome* B){
     Polynome* R = creer_polynome(B->n-1);
-    Polynome* Q = creer_polynome(A->n);
+    Polynome* Q = creer_polynome(A->n-B->n);
     Polynome* temp = creer_polynome(A->n-B->n);
     int i=A->n;
     int j=B->n;
@@ -14,6 +14,8 @@ Polynome* division(Polynome* A,Polynome* B){
         A=soustraction(A, mult_naive(temp, B));
         R=A;
         temp->coeff[A->n-B->n]=0;
+        i--;
+        j--;
     }
     detruire_polynome(Q);
     detruire_polynome(temp);
