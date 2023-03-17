@@ -16,6 +16,8 @@ def addition(f, g) :
     res = [0]*(dmin+1)
     for i in range(0, dmin+1):
         res[i] = cf[i]+cg[i]
+    
+    #ajout des derniers coefficients
     if dmin==df :
         res.extend(cg[dmin+1:])
     else :
@@ -31,7 +33,8 @@ def soustraction(f, g) :
     res = [0]*(dmin+1)
     for i in range(0, dmin+1):
         res[i] = cf[i]-cg[i]
-        print(res[i])
+    
+    #ajout des derniers coefficients
     if dmin==df :
         for e in cg[dmin:] :
             res.append(-e)
@@ -46,7 +49,7 @@ def mult_naive(f, g) :
     dg = g.degree() ; cg = g.list()
     
     res = [0]*(df+dg+1) 
-
+    
     for i in range(0, df+1):
         for j in range(0, dg+1):
             res[i+j] += cf[i]*cg[j]
@@ -60,7 +63,7 @@ def karatsuba(f, g) :
     if g.is_zero() : return g
     
     df = f.degree(); dg = g.degree()
-    if (df == 0 or dg == 0) :
+    if (df == 0 or dg == 0) : #on considère que le thresold est 0 (à modifier ?) 
         return mult_naive(f, g)
 
     cf = f.list(); cg = g.list()
@@ -91,11 +94,8 @@ def division(f, g) :
     if f.is_zero() : return f
 
     while (r.degree() >= g.degree()) :
-        print("coeff r = ", cr[-1])
-        q = cr[-1]*inverse(cg[g.degree()])*t**(r.degree()-g.degree())
-        print("q = ", q)
+        q = cr[-1]*inverse(cg[g.degree()])*t**(r.degree()-g.degree()) #cr[-1] n'est pas bon, l'algorithme ne fonctionne pas si à la fin de la boucle r a un coeff dominant nul
         r = r - q*g
-        print("r = ", r)
     return r
 
 #algorithmes du calcul de g(a) mod f
@@ -105,7 +105,6 @@ def eval_naive(g, a, f) :
     res = 0
     for i in range(g.degree()+1) :
         res += g[i]*a**i
-        print("res[i] = ", res)
     return division(res, f)
     
 #def eval_variante(g, a, f) :
