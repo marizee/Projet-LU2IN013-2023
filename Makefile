@@ -1,8 +1,8 @@
 CFLAGS=-Wall -Wextra
 all: programme
 
-programme : main.o polynome.o structure.o
-	gcc $(CFLAGS) -o programme main.o polynome.o structure.o div_euclidienne.o congruence.o -lm
+programme : main.o polynome.o structure.o div_euclidienne.o
+	gcc $(CFLAGS) -o programme main.o polynome.o structure.o div_euclidienne.o -lm
 
 structure.o: structure.c structure.h
 	gcc $(CFLAGS) -c structure.c

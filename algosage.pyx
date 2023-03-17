@@ -63,25 +63,25 @@ def karatsuba(f, g) :
     if g.is_zero() : return g
     
     df = f.degree(); dg = g.degree()
-    if (df == 0 or dg == 0) : #on considère que le thresold est 0 (à modifier ?) 
+    if (df <= 10 and dg <= 10) : #on considère que le thresold est 0 (à modifier ?) 
         return mult_naive(f, g)
 
     cf = f.list(); cg = g.list()
-    k = max(df, dg).ceil()
+    k = max(df/2, dg/2).ceil()
 
     f0 = ring(cf[:k]); f1 = ring(cf[k:])
     g0 = ring(cg[:k]); g1 = ring(cg[k:])
 
     h1 = karatsuba(f0, g0)
     h2 = karatsuba(f1, g1)
-    h5 = karatsuba(addition(f0,f1), addition(g0,g1))
+    h5 = karatsuba(f0+f1, g0+g1)
     h7 = h5 - h1 - h2
 
     #h = h1 + h7.shift(k) + h2.shift(2*k) 
     #to shift a function = "déplacer le graphe de la fonction"
     #h7.shift(k) va remplacer l'indet par t^k donc élever le degré de k ?
 
-    h = h1 + mult_naive(h7, t**k) + mult_naive(h2, t**(2*k))
+    h = h1 + h7.shift(k) + h2.shift(2*k)
 
     return h
 
@@ -90,13 +90,28 @@ def division(f, g) :
     t = f.parent().gen()    
 
     r = f
-    cr = f.coefficients(); cg = g.list()
+    cr = f.list(); cg = g.list()
     if f.is_zero() : return f
 
     while (r.degree() >= g.degree()) :
         q = cr[-1]*inverse(cg[g.degree()])*t**(r.degree()-g.degree()) #cr[-1] n'est pas bon, l'algorithme ne fonctionne pas si à la fin de la boucle r a un coeff dominant nul
         r = r - q*g
+        cr = r.list()
     return r
+
+#division euclidienne polynomes
+def division2(f, g) :
+    ring = f.parent()
+    r = f
+    invg = inverse(g.leading_coefficient())
+
+    while (r.degree() >= g.degree()) :
+        q = r.leading_coefficient()*invg
+        q = ring(q).shift(r.degree()-g.degree())
+        r = r - q*g
+
+    return r
+
 
 #algorithmes du calcul de g(a) mod f
 def eval_naive(g, a, f) :
@@ -106,6 +121,12 @@ def eval_naive(g, a, f) :
     for i in range(g.degree()+1) :
         res += g[i]*a**i
     return division(res, f)
+
+# TODO
+# -> version comme naive2
+# -> reduire modulo f au fur et a mesure (dans naive 2)
+# -> faire version Horner
+
     
 #def eval_variante(g, a, f) :
 #    ring = g.parent()
@@ -128,3 +149,35 @@ def eval_naive(g, a, f) :
  #       ac[i] = division(a*ac[i-1], f) 
     
  #   ma = 
+
+
+
+
+
+
+
+
+
+######################################################
+#  quand a est dans le corps (et donc pas de mod f)  #
+######################################################
+
+
+#algorithmes du calcul de g(a) pour a dans le corps
+def eval_naive2(g, a) :
+    res = 0
+    ai = 1
+    for i in range(g.degree()+1) :
+        res += g[i]*ai
+        ai = a * ai
+    return res
+
+#methode de Horner
+def eval_naive_horner(g,a):
+    n = g.degree()
+    res = g.leading_coefficient()
+    for i in range(1,n+1) :
+        res = g[n-i] + res*a
+    return res
+
+
