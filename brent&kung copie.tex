@@ -43,7 +43,7 @@ Composition modulaire \text{Brent et Kung (f , a, g)}
         \textbf{Entrée:} f de degré n dans $\mathbb{K}[\mathrm{X}]$, a dans $\mathbb{K}[\mathrm{X}]_{<n}$ et \text{g} dans $\mathbb{K}[\mathrm{Y}]_{<d}$\\
         \textbf{Sortie:} \text{g(a) rem f}
         \begin{enumerate}
-        \item \text{r} $\leftarrow \lceil ^{1/2} \rceil$, \text{s} $\leftarrow \lceil d/r \rceil$ 
+        \item \text{r} $\leftarrow \lceil d^{1/2} \rceil$, \text{s} $\leftarrow \lceil d/r \rceil$ 
         \item $\text{â}_{0} \leftarrow 1$ \text{avec } $\text{â}_{i}=\text{a}^{i} \text{ rem f}$
         \item \text{for i=1,...,r do} $\text{â}_{i} \leftarrow \text{a}.\text{â}_{i} \text{-1 rem f}$
         \item \text{A} $\leftarrow \text{mat}(\text{coeff}(\text{â}_{i},j))_{0\leqslant \text{i}<\text{r}, 0\leqslant \text{j}<\text{n}}  dans \mathbb{K}^{r\times n}$
