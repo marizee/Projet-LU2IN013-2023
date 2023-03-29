@@ -6,6 +6,43 @@ def inverse(a, p=7) :
         b=b+1   
     return b
 
+#inverse avec euclide 
+def inverse_euclide(a, p=7) :
+    nO = a
+    bO = p
+    tO = 0
+    t = 1
+    q = nO//bO
+    r = nO - q*bO
+    temp = 0
+    while (r > 0) :
+        temp = tO - q*t
+        if temp >= 0 :
+            temp = temp % p
+        else :
+            temp = p - ((-temp) % p)
+        tO = t
+        t = temp
+        nO = bO
+        bO = r
+        q = nO//bO
+        r = nO - q*bO
+     return t
+
+#calcul pgcd pour verifier si un nombre est inversible dans Z/pZ
+def pgcd(x, y) :
+    res = 0
+    if y==0 :
+        res = x
+    else :
+        res = pgcd(y, x%y)
+    return res
+
+def est_inversible(x, p=7) :
+    if pgcd(x, p) == 1 :
+        return True
+    return False
+
 #addition et multiplication sur polynomes
 def addition(f, g) :
     ring = f.parent()
@@ -94,7 +131,7 @@ def division(f, g) :
     if f.is_zero() : return f
 
     while (r.degree() >= g.degree()) :
-        q = cr[-1]*inverse(cg[g.degree()])*t**(r.degree()-g.degree()) #cr[-1] n'est pas bon, l'algorithme ne fonctionne pas si à la fin de la boucle r a un coeff dominant nul
+        q = cr[-1]*inverse_euclide(cg[g.degree()])*t**(r.degree()-g.degree()) #cr[-1] n'est pas bon, l'algorithme ne fonctionne pas si à la fin de la boucle r a un coeff dominant nul
         r = r - q*g
         cr = r.list()
     return r
@@ -103,7 +140,7 @@ def division(f, g) :
 def division2(f, g) :
     ring = f.parent()
     r = f
-    invg = inverse(g.leading_coefficient())
+    invg = inverse_euclide(g.leading_coefficient())
 
     while (r.degree() >= g.degree()) :
         q = r.leading_coefficient()*invg
