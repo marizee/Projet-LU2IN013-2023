@@ -4,7 +4,7 @@
 #include <math.h>
 #include "polynome.h"
 
-#define P = 97;
+#define P 97
 
 
 //ARITHMETIQUE
@@ -71,7 +71,7 @@ Polynome* karatsuba(Polynome* f, Polynome* g) {
     //si un des deux polynomes est de degrÃ© 0, on utilise la multiplication naÃ¯ve
     if (f->n == 1 || g->n == 1) return mult_naive(f, g);
     
-    int k = ceil(fmax(f->n, g->n)/2.);
+    int k = (f->n >= g->n) ? f->n/2.0 : g->n/2.0;
 
     //allocation mÃ©moire des "sous-polynomes"
     Polynome* f0 = creer_polynome(k-1);
@@ -124,5 +124,3 @@ Polynome* karatsuba(Polynome* f, Polynome* g) {
     
     return h;
 }
-
-
