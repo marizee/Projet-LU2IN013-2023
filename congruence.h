@@ -1,9 +1,8 @@
 #ifndef CONGRUENCE_H
 #define CONGRUENCE_H
 
-long reste(long a);
-long somme(long a, long b);
-long produit(long a, long b);
-long inverse(long a);
+long pgcd(long x,long y);
+int est_inversible(long a);
+long inverse_euclide(long a);
 
 #endif
