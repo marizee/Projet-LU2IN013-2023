@@ -3,6 +3,6 @@
 #include "polynome.h"
 #include "congruence.h"
 
-Polynome* division(Polynome* A,Polynome* B);
+//Polynome* division(Polynome* A,Polynome* B);
 
 #endif
