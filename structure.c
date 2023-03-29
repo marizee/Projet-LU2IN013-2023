@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "structure.h"
+#define P 97
 
 
 Polynome* creer_polynome(int degre){
@@ -35,7 +36,7 @@ Polynome* initialiser_polynome(){
         for(int i=0; i<p->n; i++){
             printf("\t");
             scanf(" %d",&a);
-            p->coeff[i] = a;
+            p->coeff[i] = (a<0) ? p->coeff[i] = -(a%P) : a%P;
         }
     } 
     return p;
@@ -43,9 +44,9 @@ Polynome* initialiser_polynome(){
 
 Polynome* coeff_to_polynome(int coeff[], int degre) {
     Polynome* new = creer_polynome(degre);
-    if (new->coeff != NULL) {
-        for (int i=0; i<degre+1; i++) {
-            new->coeff[i] = coeff[i];
+    if(new->coeff != NULL){
+        for (int i=0; i<degre+1; i++){
+            new->coeff[i] = (coeff[i]<0) ? new->coeff[i]=-(coeff[i]%P) : coeff[i]%P;
         }
     }
     return new;
