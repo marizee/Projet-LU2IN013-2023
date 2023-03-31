@@ -60,5 +60,3 @@ long inverse_euclide(long a) {
     }
     return t;
 }
-
-
