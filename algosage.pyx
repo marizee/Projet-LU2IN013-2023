@@ -154,46 +154,74 @@ def division2(f, g) :
 def eval_naive(g, a, f) :
     ring = g.parent()
     cg = g.list()
-    res = 0
+    res = 0; ring(res)
+    ai = 1
+    
     for i in range(g.degree()+1) :
-        res += g[i]*a**i
+        res = res + cg[i]*ai
+        ai = a*ai
     return division(res, f)
+    
+def eval_horner(g, a, f) :
+    ring = g.parent()
+    cg = g.list()
+    res = cg[0]; 
+    ring(res)
+    ai = a; 
+    for i in range(1,g.degree()+1) :
+        res = res + cg[i]*(division(ai, f))
+        ai = a*ai
+    return res
+
+
+from sage.matrix.constructor import matrix
+def brentkung(f, a, g) :
+    #f de degré n, a de degré < n, g de degré < d
+    ring = a.parent()
+
+    d = g.degree(); n = f.degree()
+    r = d.sqrt().round()
+    s = (d/r).round()
+    print("- d:", d, "n:", n, "; r:",r, "; s:", s)
+    print()
+
+    ac = [ring(0)]*r
+    ac[0] = ring(1)
+
+    for i in range(1, r) : 
+        ac[i] = (a*ac[i-1])%f
+        print("- a**",i, " = ", ac[i])
+    print()
+
+    ma = matrix(r, n, [(ac[i])[j] for i in range(r) for j in range(n)])
+    mg = matrix(s, r, [g.list()[i*r+j] for i in range(s) for j in range(r)])
+    mb = mg*ma
+    print("- matrix a = ", ma)
+    print("- matrix g = ", mg)
+    print("- matrix b = ", mb)
+    print()
+
+    b = [ring(0)]*s
+    for i in range(s) :
+        b[i] = ring(mb[i].list())
+        print("- b[", i, "] = ", b[i])
+    print()
+
+    res = b[0]; 
+    ar = ac[r-1]
+    print("- ar:", ar)
+    for i in range(1, s) :
+        res += b[i]*ar
+        ar = ar*ar
+        print("- res au tour de boucle ", i, " = ", res)
+    print()
+
+    return  res%f
 
 # TODO
 # -> version comme naive2
 # -> reduire modulo f au fur et a mesure (dans naive 2)
 # -> faire version Horner
-
-    
-#def eval_variante(g, a, f) :
-#    ring = g.parent()
-#    res = [0]*g.degree()
-#    cg = g.list()
-
-#    for i in range(g.degree()) :
-#        res[i] = g[i]*(division(a**i, f))
-    
-#    return ring(res)
-
-#def brentkung(g, a, f) :
-#    r = ceil(g.degree()**(1/2))
-#    s = ceil(g.degree()/r)
-
-#    ac = [0]*a.degree()
-#    ac[0] = 1
-
-#    for i in range(1,r+1) :
- #       ac[i] = division(a*ac[i-1], f) 
-    
- #   ma = 
-
-
-
-
-
-
-
-
 
 ######################################################
 #  quand a est dans le corps (et donc pas de mod f)  #
