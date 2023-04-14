@@ -2,11 +2,11 @@ import time
 #congruence sur les entiers
 def inverse(a, p=7) :
     b = 0
-    while (a*b != 1) :     
-        b=b+1   
+    while (a*b != 1) :
+        b=b+1
     return b
 
-#inverse avec euclide 
+#inverse avec euclide
 def inverse_euclide(a, p=7) :
     nO = a
     bO = p
@@ -53,7 +53,7 @@ def addition(f, g) :
     res = [0]*(dmin+1)
     for i in range(0, dmin+1):
         res[i] = cf[i]+cg[i]
-    
+
     #ajout des derniers coefficients
     if dmin==df :
         res.extend(cg[dmin+1:])
@@ -70,7 +70,7 @@ def soustraction(f, g) :
     res = [0]*(dmin+1)
     for i in range(0, dmin+1):
         res[i] = cf[i]-cg[i]
-    
+
     #ajout des derniers coefficients
     if dmin==df :
         for e in cg[dmin:] :
@@ -84,23 +84,23 @@ def mult_naive(f, g) :
     ring = f.parent()
     df = f.degree() ; cf = f.list()
     dg = g.degree() ; cg = g.list()
-    
-    res = [0]*(df+dg+1) 
-    
+
+    res = [0]*(df+dg+1)
+
     for i in range(0, df+1):
         for j in range(0, dg+1):
             res[i+j] += cf[i]*cg[j]
 
-    return ring(res) 
-    
+    return ring(res)
+
 def karatsuba(f, g) :
     ring = f.parent()
     t = ring.gen()
     if f.is_zero() : return f
     if g.is_zero() : return g
-    
+
     df = f.degree(); dg = g.degree()
-    if (df <= 10 and dg <= 10) : #on considère que le thresold est 0 (à modifier ?) 
+    if (df <= 10 and dg <= 10) : #on considère que le thresold est 0 (à modifier ?)
         return mult_naive(f, g)
 
     cf = f.list(); cg = g.list()
@@ -114,7 +114,7 @@ def karatsuba(f, g) :
     h5 = karatsuba(f0+f1, g0+g1)
     h7 = h5 - h1 - h2
 
-    #h = h1 + h7.shift(k) + h2.shift(2*k) 
+    #h = h1 + h7.shift(k) + h2.shift(2*k)
     #to shift a function = "déplacer le graphe de la fonction"
     #h7.shift(k) va remplacer l'indet par t^k donc élever le degré de k ?
 
@@ -124,7 +124,7 @@ def karatsuba(f, g) :
 
 #division euclidienne polynomes
 def division(f, g) :
-    t = f.parent().gen()    
+    t = f.parent().gen()
 
     r = f
     cr = f.list(); cg = g.list()
@@ -156,18 +156,18 @@ def eval_naive(g, a, f) :
     cg = g.list()
     res = 0; ring(res)
     ai = 1
-    
+
     for i in range(g.degree()+1) :
         res = res + cg[i]*ai
         ai = a*ai
     return division(res, f)
-    
+
 def eval_horner(g, a, f) :
     ring = g.parent()
     cg = g.list()
-    res = cg[0]; 
+    res = cg[0];
     ring(res)
-    ai = a; 
+    ai = a;
     for i in range(1,g.degree()+1) :
         res = res + cg[i]*(division(ai, f))
         ai = a*ai
@@ -180,43 +180,51 @@ def brentkung(f, a, g) :
     ring = a.parent()
 
     d = g.degree()+1; n = f.degree()
+    if a.degree() >= n:
+        raise ValueError("pas le droit nan mais oh")
+
     r = RR(d.sqrt()).ceil()
     s = RR(d/r).ceil()
-    print("- d:", d, "n:", n, "; r:",r, "; s:", s)
-    print()
+    #print("- d:", d, "n:", n, "; r:",r, "; s:", s)
+    #print()
 
-    ac = [ring(0)]*r
+    ac = [ring(0)]*(r+1)
     ac[0] = ring(1)
 
-    for i in range(1, r) : 
+    tstart = time.time()
+    for i in range(1, r+1) :
         ac[i] = (a*ac[i-1])%f
-        print("- a**",i, " = ", ac[i])
-    print()
+        #print("- a**",i, " = ", ac[i])
+    #print()
+    tend = time.time()
+    print(tend-tstart)
+
 
     ma = matrix(r, n, [(ac[i])[j] for i in range(r) for j in range(n)])
-    mg = matrix(s, r, [g.list()[i*r+j] for i in range(s) for j in range(r)])
+    mg = matrix(s, r, [g[i*r+j] for i in range(s) for j in range(r)])
     mb = mg*ma
-    print("- matrix a = ", ma)
-    print("- matrix g = ", mg)
-    print("- matrix b = ", mb)
-    print()
+    #print("- matrix a = ", ma)
+    #print("- matrix g = ", mg)
+    #print("- matrix b = ", mb)
+    #print()
 
     b = [ring(0)]*s
     for i in range(s) :
         b[i] = ring(mb[i].list())
-        print("- b[", i, "] = ", b[i])
-    print()
+        #print("- b[", i, "] = ", b[i])
+    #print()
 
-    res = b[0]; 
-    ar = ac[r-1]
-    print("- ar:", ar)
+    res = b[0];
+    ar = ac[r]
+    #print("- ar:", ar)
+    tmp = ar
     for i in range(1, s) :
-        res += b[i]*ar
-        ar = ar*ar
-        print("- res au tour de boucle ", i, " = ", res)
-    print()
+        res += b[i]*tmp % f
+        tmp = ar*tmp % f
+        #print("- res au tour de boucle ", i, " = ", res)
+    #print()
 
-    return  res%f
+    return  res
 
 # TODO
 # -> version comme naive2
@@ -245,4 +253,13 @@ def eval_naive_horner(g,a):
         res = g[n-i] + res*a
     return res
 
+
+pring = PolynomialRing(GF(997), 'x')
+n = 10000
+d = 12000
+f = pring.random_element(n)
+a = pring.random_element(n-1)
+g = pring.random_element(d-1)
+#p = brentkung(f, a, g)
+# pour tester: g(pring.quotient(f)(a))
 

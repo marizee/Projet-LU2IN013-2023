@@ -4,7 +4,7 @@
 #include <math.h>
 #include "polynome.h"
 
-#define P 97
+#define P 7
 
 
 //ARITHMETIQUE
@@ -16,11 +16,11 @@ Polynome* addition(Polynome* p1, Polynome* p2) {
     for (int i=0; i<n_sup; i++) {
 
         //on applique l'addition tant que les 2 opÃ©randes existent
-        if (i < n_inf) new->coeff[i] = p1->coeff[i] + p2->coeff[i];
+        if (i < n_inf) new->coeff[i] = (p1->coeff[i] + p2->coeff[i])%P;
         else {
             //on ajoute les coefficients restants
-            if (n_inf == p1->n) new->coeff[i] = p2->coeff[i];
-            else new->coeff[i] = p1->coeff[i];
+            if (n_inf == p1->n) new->coeff[i] = (p2->coeff[i])%P;
+            else new->coeff[i] = (p1->coeff[i])%P;
         }
     }
     ajuste_degre(new);
@@ -34,11 +34,11 @@ Polynome* soustraction(Polynome* p1, Polynome* p2) {
 
     for (int i=0; i<n_sup; i++) {
         //on applique la soustraction tant que les 2 opÃ©randes existent
-        if (i < n_inf) new->coeff[i] = p1->coeff[i] - p2->coeff[i];
+        if (i < n_inf) new->coeff[i] = (p1->coeff[i] - p2->coeff[i])%P;
         else {
             //on ajoute les coefficients restants
-            if (n_inf == p1->n) new->coeff[i] = -p2->coeff[i];
-            else new->coeff[i] = p1->coeff[i];
+            if (n_inf == p1->n) new->coeff[i] = (-p2->coeff[i])%P;
+            else new->coeff[i] = (p1->coeff[i])%P;
         }
     }
     ajuste_degre(new);
@@ -56,7 +56,7 @@ Polynome* mult_naive(Polynome* p1, Polynome* p2) {
 
     for (int i=0; i<p1->n; i++) {
         for (int j=0; j<p2->n; j++) {
-            new->coeff[i+j] += p1->coeff[i]*p2->coeff[j];
+            new->coeff[i+j] += (p1->coeff[i]*p2->coeff[j])%P;
         }
     }
     ajuste_degre(new);
@@ -83,13 +83,13 @@ Polynome* karatsuba(Polynome* f, Polynome* g) {
     //affectation des coeff aux sous-polynomes correspondants
     int i,j;  
     if (f->coeff != NULL) {
-        if (f0->coeff != NULL) for (i=0; i < k; i++) f0->coeff[i] = f->coeff[i];
-        if (f1->coeff != NULL) for (i=k, j=0; i < f->n; i++, j++) f1->coeff[j] = f->coeff[i]; 
+        if (f0->coeff != NULL) for (i=0; i < k; i++) f0->coeff[i] = (f->coeff[i])%P;
+        if (f1->coeff != NULL) for (i=k, j=0; i < f->n; i++, j++) f1->coeff[j] = (f->coeff[i])%P; 
     }
     int l,m;
     if (g->coeff != NULL) {
-        if (g0->coeff != NULL) for (l=0; l < k; l++) g0->coeff[l] = g->coeff[l];
-        if (g1->coeff != NULL) for (l=k, m=0; l < g->n; l++, m++) g1->coeff[m] = g->coeff[l];
+        if (g0->coeff != NULL) for (l=0; l < k; l++) g0->coeff[l] = (g->coeff[l])%P;
+        if (g1->coeff != NULL) for (l=k, m=0; l < g->n; l++, m++) g1->coeff[m] = (g->coeff[l])%P;
     }
     
     //Ã©tapes de l'algorithmes
