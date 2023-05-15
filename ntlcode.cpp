@@ -169,6 +169,14 @@ int main ()
         	random(g, d);
 		random(a, 1000);
         	random(f, 10000);
+		
+		double tstartk, tendk;
+        	tstartk = GetWallTime();
+		ZZ_pX result_karatsuba = karatsuba(g, f);
+		tendk = GetWallTime();
+		std::cout << "karatsuba(g, f) = " << result_karatsuba << std::endl;
+		std::cout << "time karatsuba: " << tendk - tstartk << std::endl;
+
 	
 		double tstartn, tendn;
         	tstartn = GetWallTime();
