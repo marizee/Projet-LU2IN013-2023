@@ -10,6 +10,46 @@
 using namespace NTL;
 using namespace std;
 
+ZZ_pX karatsuba(const ZZ_pX& f, const ZZ_pX& g) {
+    if (IsZero(f) || IsZero(g))
+        return ZZ_pX(0);
+
+    long df = deg(f);
+    long dg = deg(g);
+    if (df <= 10 && dg <= 10)
+        return f * g;
+
+    long k = max(df / 2, dg / 2);
+
+    ZZ_pX f0, f1;
+    SetLength(f0, k);
+    SetLength(f1, df - k + 1);
+    for (long i = 0; i < k; i++)
+        f0[i] = f[i];
+    for (long i = k; i <= df; i++)
+        f1[i - k] = f[i];
+
+    ZZ_pX g0, g1;
+    SetLength(g0, k);
+    SetLength(g1, dg - k + 1);
+    for (long i = 0; i < k; i++)
+        g0[i] = g[i];
+    for (long i = k; i <= dg; i++)
+        g1[i - k] = g[i];
+
+    ZZ_pX h1 = karatsuba(f0, g0);
+    ZZ_pX h2 = karatsuba(f1, g1);
+    ZZ_pX h5 = karatsuba(f0 + f1, g0 + g1);
+    ZZ_pX h7 = h5 - h1 - h2;
+
+    ZZ_pX h;
+    LeftShift(h7, h7, k);
+    LeftShift(h2, h2, 2 * k);
+    h = h1 + h7 + h2;
+
+    return h;
+}
+
 ZZ_pX eval_naive_improved(const ZZ_pX& g, const ZZ_pX& a, const ZZ_pX& f) {
     ZZ_pX res = g[0];
     ZZ_pX ai = a % f;
@@ -23,8 +63,8 @@ ZZ_pX eval_naive_improved(const ZZ_pX& g, const ZZ_pX& a, const ZZ_pX& f) {
     return res % f;
 }
 
-ZZ_p brentkung(const ZZ_pX& g, const ZZ_pX& a, const ZZ_pX& f) {
-    ZZ_pContext context;
+ZZ_pX brentkung(const ZZ_pX& g, const ZZ_pX& a, const ZZ_pX& f) {
+    ZZ_pXContext context;
     context.save();
     context.restore();
 
@@ -74,11 +114,11 @@ ZZ_p brentkung(const ZZ_pX& g, const ZZ_pX& a, const ZZ_pX& f) {
         b[i] = rep(mb[i]);
     }
 
-    ZZ_p res;
+    ZZ_pX res;
     res = b[0];
-    ZZ_p ar = ac[r];
+    ZZ_pX ar = ac[r];
 
-    ZZ_p tmp = ar;
+    ZZ_pX tmp = ar;
     for (long i = 1; i < s; i++) {
         res += (b[i] * tmp) % f;
         tmp = ar * tmp;
