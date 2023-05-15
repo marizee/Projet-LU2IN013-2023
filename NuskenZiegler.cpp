@@ -10,6 +10,19 @@
 using namespace NTL;
 using namespace std;
 
+ZZ_pX eval_naive_improved(const ZZ_pX& g, const ZZ_pX& a, const ZZ_pX& f) {
+    ZZ_pX res = g[0];
+    ZZ_pX ai = a % f;
+    long n = g.degree();
+
+    for (long i = 1; i <= n; i++) {
+        res += g[i] * ai;
+        ai = (a * ai) % f;
+    }
+
+    return res % f;
+}
+
 ZZ_p brentkung(const ZZ_pX& g, const ZZ_pX& a, const ZZ_pX& f) {
     ZZ_pContext context;
     context.save();
@@ -109,16 +122,27 @@ int main ()
 		tstart = GetWallTime();
 		zz_pX c = m*n;
 		tend = GetWallTime();
+		std::cout << "m * n = " << c << std::endl;
 		std::cout << "temps pour multiplication: " << tend - tstart << std::endl;
-        ZZ_pX g, a, f;
-        random(g, d);
+	
+        	ZZ_pX g, a, f;
+        	random(g, d);
 		random(a, 1000);
-        random(f, 10000);
-        double start, end;
-        start = GetWallTime();
-		ZZ_pX result = brentkung(g, a, f);
-		end = GetWallTime();
-		std::cout << "time brentkung: " << end - start << std::endl;
+        	random(f, 10000);
+	
+		double tstartn, tendn;
+        	tstartn = GetWallTime();
+		ZZ_pX result_naive = eval_naive_improved(g, a, f);
+		tendn = GetWallTime();
+		std::cout << "g(a) % f = " << result_naive << std::endl;
+		std::cout << "time algo naive: " << tendn - tstartn << std::endl;
+
+        	double tstartbk, tendbk;
+        	tstartbk = GetWallTime();
+		ZZ_pX result_brentkung = brentkung(g, a, f);
+		tendbk = GetWallTime();
+		std::cout << "g(a) % f = " << result_brentkung << std::endl;
+		std::cout << "time brentkung: " << tendbk - tstartbk << std::endl;
 
     return 0;
 }
