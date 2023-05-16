@@ -23,6 +23,16 @@ def eval_naive_improved(g, a, f) :
 	return res % f
 
 # TODO Horner
+def horner(g, a, f) :
+    res = g[g.degree()]
+    for i in range(g.degree()-1, -1, -1) :
+        res = (res*a)%f + g[i]
+    return res%f
+def horner2(g, a, f) :
+    res = g[len(g)-1]
+    for i in range(len(g)-2, -1, -1) :
+        res = (res*a)%f + g[i]
+    return res%f
 
 def brentkung(g, a, f) :
 
@@ -51,13 +61,7 @@ def brentkung(g, a, f) :
 	res = b[0];
 	ar = ac[r]
 
-	tmp = ar
-	for i in range(1, s) :
-		res += (b[i]*tmp) % f
-		tmp = ar*tmp
-  #for i in range(s) :
-  #  res += eval_horner(b[i], ar, f)
-
+	res = horner2(b, ar, f)
 	return res
 
 def brentkung2(g, a, f) :
