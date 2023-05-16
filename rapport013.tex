@@ -1,0 +1,194 @@
+\documentclass[a4paper]{article}
+\usepackage{amsmath, amssymb, mathtools}
+\usepackage{amsthm}
+\usepackage{fontspec}
+\usepackage{xunicode}
+\usepackage{fancyhdr}
+\usepackage[french]{babel}
+\usepackage[a4paper,centering]{geometry}
+\usepackage{algorithm, algorithmic}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{graphicx}
+
+\fancyhead[L, C, R]{}
+\fancyfoot[L, R]{}
+\fancyfoot[C]{\vspace{1mm}\thepage}
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\footrulewidth}{1pt}
+\pagestyle{fancy}
+
+\definecolor{gray}{rgb}{0.94, 0.94, 0.94}
+\definecolor{red}{rgb}{0.6, 0, 0}
+
+\lstset{
+    numbers=left,
+    numberstyle=\tiny, 
+    backgroundcolor=\color{gray},
+    language=Python,
+    keywordstyle=\color{red},
+}
+
+\begin{document}
+
+\thispagestyle{plain}
+
+\begin{titlepage}
+    \begin{center}
+
+        \bigskip
+        \includegraphics[scale=0.5]{logo_su.jpg}~\\[4cm]
+
+        {\LARGE Rapport du projet LU2IN013}\\[0.3cm]
+        \rule{\linewidth}{0.5mm} \\[0.6cm]
+        {\huge \textbf{Composition modulaire des polynômes à une variable}}\\[0.4cm]
+        \rule{\linewidth}{0.5mm} \\[1cm]
+        {\large Encadrant : M. Vincent NEIGER}\\[5cm]
+
+        {\Large Serigne Fallou FALL, Marie BONBOIRE}
+        
+        \vfill
+        Février 2023 - Juin 2023
+
+
+    \end{center}
+\end{titlepage}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+
+\section{INTRODUCTION}
+\subsection{Sujet}
+\subsection{Objectifs}
+\subsection{Choix d'implantation}
+
+
+\section{NOTIONS}
+
+\subsection{Airthmétique modulaire}
+
+\subsection{Multiplication}
+
+\begin{lstlisting}[frame=leftline, title={multiplication naive}]
+    def mult_naive(f, g) :
+    ring = f.parent()
+  
+    res = [0]*(f.degree()+g.degree()+1) 
+    
+    for i in range(0, f.degree()+1):
+        for j in range(0, g.degree()+1):
+            res[i+j] += f[i]*g[j]
+
+    return ring(res) 
+\end{lstlisting}
+
+\begin{lstlisting}[frame=leftline, title={karastuba}]
+def karatsuba(f, g) :
+    ring = f.parent()
+    t = ring.gen()
+    if f.is_zero() : return f
+    if g.is_zero() : return g
+    
+    if (f.degree() <= 10 and g.degree() <= 10) : 
+        return mult_naive(f, g)
+
+    k = max(f.degree()/2, g.degree()/2).ceil()
+
+    f0 = ring(f.list()[:k]); f1 = ring(f.list()[k:])
+    g0 = ring(g.list()[:k]); g1 = ring(g.list()[k:])
+
+    h1 = karatsuba(f0, g0)
+    h2 = karatsuba(f1, g1)
+    h5 = karatsuba(f0+f1, g0+g1)
+    h7 = h5 - h1 - h2
+
+    h = h1 + h7.shift(k) + h2.shift(2*k)
+
+    return h
+\end{lstlisting}
+
+Perfomances : inserer tableau de comparaison  \cite{aecf}
+
+\section{ALGORITHMES DE COMPOSITION MODULAIRE}
+\subsection{Algorithme naïf}
+
+\begin{lstlisting}[frame=leftline, title={naive}]
+def eval_naive_improved(g, a, f) :
+	ring = g.parent()
+
+	res = ring(g[0])
+	ai = a % f
+	for i in range(1, g.degree()+1) :
+		res = res + g[i]*ai
+		ai = (a*ai) % f
+	return res % f
+\end{lstlisting}
+
+\subsection{Algorithme d'Horner}
+
+\begin{lstlisting}[frame=leftline, title={Horner}]
+def horner(g, a, f) :
+    res = g[g.degree()]
+    for i in range(g.degree()-1, -1, -1) :
+        res = (res*a)%f + g[i]
+    return res%f
+\end{lstlisting}
+
+\subsection{Algorithme de Brent et Kung}
+
+\begin{lstlisting}[frame=leftline, title={brent and kung}]
+def brentkung(g, a, f) :
+
+	ring = a.parent()
+	d = g.degree()+1; n = f.degree()
+	if a.degree() >= n:
+		raise ValueError("Erreur: a de degré trop élevé")
+
+	r = RR(d.sqrt()).ceil()
+	s = RR(d/r).ceil()
+
+	ac = [ring(0)]*(r+1)
+	ac[0] = ring(1)
+
+	for i in range(1, r+1) :
+		ac[i] = (a*ac[i-1]) % f
+
+	ma = matrix(r, n, [(ac[i])[j] for i in range(r) for j in range(n)])
+	mg = matrix(s, r, [g[i*r+j] for i in range(s) for j in range(r)])
+	mb = mg*ma
+
+	b = [ring(0)]*s
+	for i in range(s) :
+		b[i] = ring(mb[i].list())
+
+	res = b[0]
+	ar = ac[r]
+
+	res = horner(b, ar, f)
+	return res
+\end{lstlisting}
+
+\subsection{Comparaison}
+
+
+\section{ALGORITHME DE NUSKEN ET ZIEGLER}
+
+
+
+\newpage
+\section{BIBLIOGRAPHIE}
+
+\begin{thebibliography}{10}
+    \bibitem{aecf} Alin Bostan, Frédéric Chyzak, Marc Giusti, Romain Lebreton, Grégoire Lecerf, Bruno Salvy, Eric Schost,
+    \emph{Algorithmes efficaces en calcul formel}, 2017
+
+\end{thebibliography}
+
+
+\end{document}
+
+
