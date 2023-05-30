@@ -7,14 +7,76 @@
 using namespace NTL;
 using namespace std;
 
+//addition de deucx polynomes dans pZ
+zz_pX addition(const zz_pX& f, const zz_pX& g) {
+    long df = deg(f); // degré du polynôme f
+    long dg = deg(g); // degré du polynôme g
+    long dmin = std::min(df, dg);
+
+    zz_pX res;
+    SetCoeff(res, dmin, coeff(f, dmin) + coeff(g, dmin));
+
+    for (long i = dmin - 1; i >= 0; i--) {
+        SetCoeff(res, i, coeff(f, i) + coeff(g, i));
+    }
+
+    // Ajout des derniers coefficients
+    if (dmin == df) {
+        for (long i = dmin + 1; i <= dg; i++) {
+            SetCoeff(res, i, coeff(g, i));
+        }
+    } else {
+        for (long i = dmin + 1; i <= df; i++) {
+            SetCoeff(res, i, coeff(f, i));
+        }
+    }
+
+    return res;
+}
+
+//soustraction de deux polynomes dans pZ
+zz_pX soustraction(const zz_pX& f, const zz_pX& g) {
+    long df = deg(f); // degré du polynôme f
+    long dg = deg(g); // degré du polynôme g
+    long dmin = std::min(df, dg);
+
+    zz_pX res;
+    SetCoeff(res, dmin, coeff(f, dmin) - coeff(g, dmin));
+
+    for (long i = dmin - 1; i >= 0; i--) {
+        SetCoeff(res, i, coeff(f, i) - coeff(g, i));
+    }
+
+    // Ajout des derniers coefficients
+    if (dmin == df) {
+        for (long i = dmin; i <= dg; i++) {
+            SetCoeff(res, i, -coeff(g, i));
+        }
+    } else {
+        for (long i = dmin + 1; i <= df; i++) {
+            SetCoeff(res, i, coeff(f, i));
+        }
+    }
+
+    return res;
+}
+
+//division euclidienne de deux polynomes dans pZ
+zz_pX division_euclidienne(const zz_pX& f, const zz_pX& g) {
+    zz_pX quotient, reste;
+    DivRem(quotient, reste, f, g);
+    return quotient;
+}
+
+//fonction auxiliaire 
 void init_poly_with_coeffs(zz_pX& poly, const vec_zz_p& coeffs) {
     long n = coeffs.length();
-    random(poly,n);
     for (long i = 0; i < n; i++) {
         SetCoeff(poly, i, coeffs[i]);
     }
 }
 
+//multiplication de deux polynomes par l'algorithme de karatsuba
 zz_pX karatsuba(const zz_pX& f, const zz_pX& g) {
     if (IsZero(f) || IsZero(g))
         return zz_pX(0);
@@ -62,22 +124,25 @@ zz_pX karatsuba(const zz_pX& f, const zz_pX& g) {
     return h;
 }
 
-zz_pX eval_naive_improved(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
-
-    long n = deg(g);
+//composition modulaire méthode naive
+zz_pX eval_naive(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
     zz_pX res;
-    random(res,n+1);
-    SetCoeff(res, 0, g[0]);
-    zz_pX ai = a % f;
+    SetCoeff(res, 0, 0); // Initialisation de res à 0
 
-    for (long i = 1; i <= n; i++) {
-        res += g[i] * ai;
-        ai = (a * ai) % f;
+    long dg = deg(g); // degré du polynôme g
+    zz_pX ai;
+    SetCoeff(ai, 0, 1); // ai = 1
+
+    for (long i = 0; i <= dg; i++) {
+        res += coeff(g, i) * ai; // res = res + cg[i] * ai
+        ai = a * ai; // ai = a * ai
     }
     ai.kill();
-    return res % f;
+
+    return res%f;
 }
 
+//composition modulaire horner
 zz_pX horner(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
     zz_pX res;
     SetCoeff(res, 0, coeff(g, deg(g)));
@@ -89,6 +154,8 @@ zz_pX horner(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
     return res;
 }
 
+//composition modulaire brent et kung ne marche pas bien pour l'instant
+//ne donne pas les bons coefs et pas performant en compléxité pour les polynomes à degré modéré ou plus petit
 zz_pX brentkung(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
 
     long d = deg(g) + 1;
@@ -125,7 +192,6 @@ zz_pX brentkung(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
     }
 
     mat_zz_p mb;
-    mb.SetDims(s, n);
     mb = mg * ma;
 
     vec_zz_pX b;
@@ -154,7 +220,7 @@ zz_pX brentkung(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
     return res;
 }
 
-
+//________________________________LES TESTS_______________________________//
 int main () 
 {
     zz_p::init(97);
@@ -176,9 +242,9 @@ int main ()
     zz_pX p5 = p1 / p2; 
 
     // Afficher les valeurs obtenues
-    cout << "p1 + p2 = " << p3 << endl;
-    cout << "p1 * p2 = " << p4 << endl;
-    cout << "p1 / p2 = " << p5 << endl;
+    //cout << "p1 + p2 = " << p3 << endl;
+    //cout << "p1 * p2 = " << p4 << endl;
+    //cout << "p1 / p2 = " << p5 << endl;
 
     // Mesurer le temps :
     long d = 100;
@@ -204,7 +270,7 @@ int main ()
 
     double tstartn, tendn;
     tstartn = GetTime();
-		zz_pX result_naive = eval_naive_improved(g, a, f);
+		zz_pX result_naive = eval_naive(g, a, f);
 		tendn = GetTime();
 		std::cout << "g(a) mod f = " << result_naive << std::endl;
 		std::cout << "time algo naive: " << tendn - tstartn << std::endl;
@@ -218,13 +284,27 @@ int main ()
 
 
     double tstartbk, tendbk;
+    zz_pX x;
     tstartbk = GetTime();
 		zz_pX result_brentkung = brentkung(g, a, f);
 		tendbk = GetTime();
 		std::cout << "g(a) mod f = " << result_brentkung << std::endl;
 		std::cout << "time brentkung: " << tendbk - tstartbk << std::endl;
 
-    
+
+    double tstartbk2, tendbk2;
+    tstartbk2 = GetTime();
+    zz_pX result;
+    CompMod(result, g, a, f);
+    tendbk2 = GetTime();
+		std::cout << "g(a) mod f = " << result << std::endl;
+		std::cout << "time brentkung2: " << tendbk2 - tstartbk2 << std::endl;
+
+    p1.kill();
+    p2.kill();
+    p3.kill();
+    p4.kill();
+    p5.kill();
     f.kill();
     g.kill();
     a.kill();
