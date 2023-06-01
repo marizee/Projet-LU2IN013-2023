@@ -1,0 +1,86 @@
+\documentclass[a4paper]{beamer}
+\usepackage{amsmath, amssymb, mathtools}
+\usepackage{amsthm}
+\usepackage{fontspec}
+\usepackage{xunicode}
+\usepackage{fancyhdr}
+\usepackage[french]{babel}
+\usepackage{algorithm, algorithmic}
+\usepackage{listings}
+
+\usetheme{Darmstadt}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{blocks}[]
+
+\title[Center text]{\textbf{Compostion modulaire des polynômes à une variable}}
+\subtitle{\small{Encadrant : M. Vincent NEIGER}}
+\author{Serigne Fallou FALL \and Marie BONBOIRE}
+\date{}
+
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+
+\section{Introduction}
+\begin{frame}
+    \tableofcontents[currentsection]
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Multiplication}
+\begin{frame}
+    \tableofcontents[currentsection]
+\end{frame}
+
+\begin{frame}{Algorithme naïf}
+    
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Composition modulaire des polynômes à une variable}
+\begin{frame}
+    \tableofcontents[currentsection]
+\end{frame}
+
+\begin{frame}[fragile]
+    \begin{lstlisting}{Python}[title={Horner}]
+        def horner(g, a, f) :
+            res = g[g.degree()]
+            for i in range(g.degree()-1, -1, -1) :
+                res = (res*a)%f + g[i]
+            return res%f
+        \end{lstlisting}
+\end{frame}
+
+\section{Algorithme de Nusken et Ziegler}
+\begin{frame}
+    \tableofcontents[currentsection]
+\end{frame}
+
+\begin{frame}
+    \frametitle{Algorithme de Nusken and Ziegler}
+    \begin{alertblock}{Complexité Nusken}
+        test
+    \end{alertblock}
+    \[
+    \begin{pmatrix}
+        g_0&g_1&...&g_{\delta -1} \\
+        g_{\delta}&g_{1+\delta}&...&g_{2\delta-1} \\
+        \vdots&\vdots&...&\vdots \\
+        g_{(\delta-1)\delta}&g_{(\delta-1)\delta+1}&...&g_{\delta^2-1}
+    
+    \end{pmatrix}
+    \]
+
+
+\end{frame}
+
+
+
+\end{document}

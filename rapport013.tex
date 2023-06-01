@@ -27,6 +27,9 @@
     backgroundcolor=\color{gray},
     language=Python,
     keywordstyle=\color{red},
+    breaklines=true,
+    frame=leftline,
+    tabsize=4,
 }
 
 \begin{document}
@@ -37,7 +40,7 @@
     \begin{center}
 
         \bigskip
-	\includegraphics[scale=0.5]{logo_su.jpg}~\\[4cm]
+        \includegraphics[scale=0.5]{logo_su.jpg}~\\[4cm]
 
         {\LARGE Rapport du projet LU2IN013}\\[0.3cm]
         \rule{\linewidth}{0.5mm} \\[0.6cm]
@@ -67,76 +70,40 @@
 \subsection{Choix d'implantation}
 
 
-\section{NOTIONS}
+\section{NOTIONS ET NOTATIONS}
+
 
 \subsection{Airthmétique modulaire}
 
-\begin{lstlisting}[frame=leftline, title={addition et soustraction}]
-def addition(f, g) :
-    ring = f.parent()
-    df = f.degree() ; cf = f.list()
-    dg = g.degree() ; cg = g.list()
-    dmin = min(df, dg)
-
-    res = [0]*(dmin+1)
-    for i in range(0, dmin+1):
-        res[i] = cf[i]+cg[i]
-
-    #ajout des derniers coefficients
-    if dmin==df :
-        res.extend(cg[dmin+1:])
-    else :
-        res.extend(cf[dmin+1:])
-    return ring(res)
-
-def soustraction(f, g) :
-    ring = f.parent()
-    df = f.degree() ; cf = f.list()
-    dg = g.degree() ; cg = g.list()
-    dmin = min(df, dg)
-
-    res = [0]*(dmin+1)
-    for i in range(0, dmin+1):
-        res[i] = cf[i]-cg[i]
-
-    #ajout des derniers coefficients
-    if dmin==df :
-        for e in cg[dmin:] :
-            res.append(-e)
-    else :
-        res.extend(cf[dmin+1:])
-    return ring(res)
-\end{lstlisting}
-
-\subsection*{Description}
-
-La fonction \texttt{addition} effectue l'addition de deux polynômes \texttt{f} et \texttt{g}. Elle crée un anneau \texttt{ring} correspondant au parent de \texttt{f}. Ensuite, elle détermine les degrés \texttt{df} et \texttt{dg} des polynômes \texttt{f} et \texttt{g}, respectivement, ainsi que les listes de coefficients correspondantes \texttt{cf} et \texttt{cg}.
-
-La variable \texttt{dmin} est initialisée avec le minimum entre \texttt{df} et \texttt{dg}. Une liste \texttt{res} de longueur \texttt{dmin+1} est créée avec des zéros.
-
-Une boucle itère de 0 à \texttt{dmin+1} et calcule la somme des coefficients correspondants de \texttt{cf} et \texttt{cg}, stockée dans \texttt{res}.
-
-Ensuite, les coefficients restants sont ajoutés à \texttt{res} en fonction de la longueur des listes de coefficients \texttt{cf} et \texttt{cg}.
-
-Finalement, la fonction retourne un polynôme construit à partir de la liste \texttt{res} dans l'anneau \texttt{ring}.
-
-La fonction \texttt{soustraction} effectue la soustraction de deux polynômes \texttt{f} et \texttt{g}. Elle crée un anneau \texttt{ring} correspondant au parent de \texttt{f}. Ensuite, elle détermine les degrés \texttt{df} et \texttt{dg} des polynômes \texttt{f} et \texttt{g}, respectivement, ainsi que les listes de coefficients correspondantes \texttt{cf} et \texttt{cg}.
-
-La variable \texttt{dmin} est initialisée avec le minimum entre \texttt{df} et \texttt{dg}. Une liste \texttt{res} de longueur \texttt{dmin+1} est créée avec des zéros.
-
-Une boucle itère de 0 à \texttt{dmin+1} et calcule la différence des coefficients correspondants de \texttt{cf} et \texttt{cg}, stockée dans \texttt{res}.
-
-Ensuite, les coefficients restants sont ajoutés à \texttt{res} en fonction de la longueur des listes de coefficients \texttt{cf} et \texttt{cg}. Les coefficients de \texttt{cg} sont ajoutés avec un signe négatif.
-
-Finalement, la fonction retourne un polynôme construit à partir de la liste \texttt{res} dans l'anneau \texttt{ring}.
+Corps d'étude : ${\mathbb{Z}/p \mathbb{Z}}$
 
 
-\subsection{Multiplication}
+addition, soustraction, division euclidienne
 
-\begin{lstlisting}[frame=leftline, title={multiplication naive}]
+\section{Multiplication}
+
+Dans cette section, on étudie deux algorithmes qui calculent le produit de deux polynômes univariés.
+Comprendre comment améliorer les perfomances d'un algorithme et les manipulations possibles sur les polynômes.
+
+
+Soient deux polynômes $f$,g $\in \mathbb{Z}/p\mathbb{Z}[\mathrm{X}]$ de degré strictement inférieur à $n-1$ :
+\[
+f=f_0+f_1\mathrm{X}+...+f_{n-1}\mathrm{X}^{n-1}\text{ et g}=\mathrm{g}_0+\mathrm{g}_1\mathrm{X}+...+\mathrm{g}_{n-1}\mathrm{X}^{n-1}
+\]
+
+\subsection{Algorithme naif}
+
+Ce premier algorithme consiste à simplement développer le produit des coefficients :
+\[
+f\text{g}=\sum_{i=0}^{2n-2} (\sum_{j+k=i}f_j\mathrm{g}_k) \mathrm{X}^i
+\]
+Cet algorithme est donc en $O(n^2)$
+
+\begin{lstlisting}[title={multiplication naive}]
     def mult_naive(f, g) :
     ring = f.parent()
-  
+
+    #initialisation de la liste des coefficients
     res = [0]*(f.degree()+g.degree()+1) 
     
     for i in range(0, f.degree()+1):
@@ -145,36 +112,41 @@ Finalement, la fonction retourne un polynôme construit à partir de la liste \t
 
     return ring(res) 
 \end{lstlisting}
-La fonction \texttt{mult\_naive} effectue la multiplication de deux polynômes $f$ et $g$ à l'aide de l'algorithme naïf.
-\subsection*{Syntaxe}
-\begin{lstlisting}[language=C++]
-zz_pX mult_naive(const zz_pX& f, const zz_pX& g)
-\end{lstlisting}
-\subsection*{Paramètres}
-\begin{itemize}
-  \item \texttt{f} : le premier polynôme à multiplier.
-  \item \texttt{g} : le deuxième polynôme à multiplier.
-\end{itemize}
-\subsection*{Valeur de retour}
-La fonction retourne un polynôme correspondant à la multiplication de $f$ et $g$.
-\subsection*{Description}
-La fonction \texttt{mult\_naive} utilise l'algorithme naïf pour effectuer la multiplication de deux polynômes. Elle crée un polynôme vide \texttt{res} de degré $\texttt{df} + \texttt{dg}$, où $\texttt{df}$ est le degré de $f$ et $\texttt{dg}$ est le degré de $g$. Ensuite, elle itère sur tous les coefficients de $f$ et $g$ et ajoute le produit des coefficients correspondants à la position appropriée dans \texttt{res}. Enfin, elle retourne le polynôme \texttt{res} résultant de la multiplication.
 
-\begin{lstlisting}[frame=leftline, title={karastuba}]
+
+\subsection{Algorithme de Karatsuba}
+
+L'amélioration proposée par Karastuba repose sur le fait de scinder les polynomes selon :
+\[
+f=f^{(0)}+f^{(1)}\mathrm{X}^k\text{ et }\mathrm{g} = \mathrm{g}^{(0)}+\mathrm{g}^{(1)}\mathrm{X}^k
+\]
+avec $f^{(0)}, f^{(1)}, \mathrm{g}^{(0)}, \mathrm{g}^{(1)}$ de degrés au plus k-1, k=$\lceil n/2 \rceil$. Le produit s'écrit alors :
+\[
+fg = f^{(0)}g^{(0)}+(f^{(0)}g^{(1)}+f^{(1)}g^{(0)})\mathrm{X}^k+f^{(0)}g^{(1)}\mathrm{X}^{2k} 
+\]
+Les opérations associées à l'algorithme permettent de gagner une multiplication par rapport à l'algorithme naïf. Par le biais des appels récursifs, ce gain se retrouve dans la puissance de l'exposant.
+Ainsi, l'algorithme de Karastuba est en $O(n^{log_2(3)}) = O(n^{1,59})$
+
+
+\begin{lstlisting}[title={karastuba}]
 def karatsuba(f, g) :
     ring = f.parent()
-    t = ring.gen()
+
+    #cas de base
     if f.is_zero() : return f
     if g.is_zero() : return g
     
+    #seuil à partir duquel la multiplication naïve est plus perfomante
     if (f.degree() <= 10 and g.degree() <= 10) : 
         return mult_naive(f, g)
 
     k = max(f.degree()/2, g.degree()/2).ceil()
 
+    #extraction des sous polynômes
     f0 = ring(f.list()[:k]); f1 = ring(f.list()[k:])
     g0 = ring(g.list()[:k]); g1 = ring(g.list()[k:])
 
+    #opérations de l'algorithme
     h1 = karatsuba(f0, g0)
     h2 = karatsuba(f1, g1)
     h5 = karatsuba(f0+f1, g0+g1)
@@ -185,38 +157,18 @@ def karatsuba(f, g) :
     return h
 \end{lstlisting}
 
-La fonction \texttt{karatsuba} effectue la multiplication de deux polynômes $f$ et $g$ à l'aide de l'algorithme de Karatsuba.
 
-\subsection*{Syntaxe}
+\subsection{Comparaison perfomances}
 
-\begin{lstlisting}[language=Python]
-def karatsuba(f, g)
-\end{lstlisting}
+\cite{aecf} Ces algorithmes sont complémentaires et non en compétition. En effet, pour des polynomes de degré inférieurs à 20 (?????) , on préfèrera l'algorithme naïfs.
 
-\subsection*{Paramètres}
-
-\begin{itemize}
-  \item \texttt{f} : le premier polynôme à multiplier.
-  \item \texttt{g} : le deuxième polynôme à multiplier.
-\end{itemize}
-
-\subsection*{Valeur de retour}
-
-La fonction retourne un polynôme correspondant à la multiplication de $f$ et $g$.
-
-\subsection*{Description}
-
-La fonction \texttt{karatsuba} utilise l'algorithme de Karatsuba pour effectuer la multiplication de deux polynômes. Si l'un des polynômes est nul, la fonction retourne le polynôme nul correspondant. Si les degrés des polynômes sont inférieurs ou égaux à un seuil (dans cet exemple, le seuil est fixé à 10), la fonction utilise l'algorithme naïf (\texttt{mult\_naive}) pour effectuer la multiplication.
-Sinon, la fonction divise les polynômes $f$ et $g$ en deux parties égales, $f_0$ et $f_1$, et $g_0$ et $g_1$, respectivement. Ensuite, elle récursivement multiplie ces parties en utilisant l'algorithme de Karatsuba. Les résultats partiels sont ensuite combinés pour obtenir le résultat final.
-Il convient de noter que dans le code, il y a une ligne commentée pour le décalage (\textit{shift}) des polynômes. Cela correspond à déplacer le graphe de la fonction en multipliant chaque terme par une puissance de $t$. Par exemple, \texttt{h7.shift(k)} remplace l'indéterminée par $t^k$, ce qui revient à élever le degré du polynôme de $k$.
-
-Perfomances : inserer tableau de comparaison  \cite{aecf}
+Perfomances : inserer tableau de comparaison  (seuil = ??????)
 
 \section{ALGORITHMES DE COMPOSITION MODULAIRE}
 \subsection{Algorithme naïf}
 
-\begin{lstlisting}[frame=leftline, title={naive}]
-def eval_naive_improved(g, a, f) :
+\begin{lstlisting}[title={naive}]
+def eval_naive(g, a, f) :
 	ring = g.parent()
 
 	res = ring(g[0])
@@ -226,76 +178,24 @@ def eval_naive_improved(g, a, f) :
 		ai = (a*ai) % f
 	return res % f
 \end{lstlisting}
-La fonction \texttt{eval\_naive\_improved} évalue un polynôme $g$ en un point $a$ modulo un polynôme $f$ en utilisant une méthode améliorée de l'algorithme naïf.
-
-\subsection*{Syntaxe}
-
-\begin{lstlisting}[language=Python]
-def eval_naive_improved(g, a, f)
-\end{lstlisting}
-
-\subsection*{Paramètres}
-
-\begin{itemize}
-  \item \texttt{g} : le polynôme à évaluer.
-  \item \texttt{a} : le point d'évaluation.
-  \item \texttt{f} : le polynôme modulo.
-\end{itemize}
-
-\subsection*{Valeur de retour}
-
-La fonction retourne un polynôme correspondant à l'évaluation de $g(a)$ modulo $f$.
-
-\subsection*{Description}
-
-La fonction \texttt{eval\_naive\_improved} évalue un polynôme $g$ en un point $a$ modulo un polynôme $f$ de manière améliorée par rapport à l'algorithme naïf. Elle utilise les fonctionnalités de la bibliothèque NTL pour effectuer les calculs.
-
-La fonction commence par initialiser le résultat \texttt{res} avec le coefficient constant de $g$. Ensuite, elle itère sur les autres coefficients de $g$ à partir de l'indice 1. À chaque itération, elle met à jour le résultat en ajoutant le produit du coefficient correspondant de $g$ avec l'évaluation courante de $a$. Elle met également à jour la valeur de $a$ en multipliant $a$ par l'évaluation précédente de $a$ modulo $f$.
-
-Enfin, la fonction retourne le résultat final \texttt{res} modulo $f$.
-
 
 \subsection{Algorithme d'Horner}
 
-\begin{lstlisting}[frame=leftline, title={Horner}]
+\[
+f(x)=f_0+f_1x+...+f_{n-1}x^{n-1}= (...((f_{n-1}x+f_{n-2})x+f_{n-3})...)x+f_0    
+\]
+
+\begin{lstlisting}[title={Horner}]
 def horner(g, a, f) :
     res = g[g.degree()]
     for i in range(g.degree()-1, -1, -1) :
         res = (res*a)%f + g[i]
     return res%f
 \end{lstlisting}
-La fonction \texttt{horner} évalue un polynôme $g$ en un point $a$ modulo un polynôme $f$ en utilisant la méthode de Horner.
-
-\subsection*{Syntaxe}
-
-\begin{lstlisting}[language=Python]
-def horner(g, a, f)
-\end{lstlisting}
-
-\subsection*{Paramètres}
-
-\begin{itemize}
-  \item \texttt{g} : le polynôme à évaluer.
-  \item \texttt{a} : le point d'évaluation.
-  \item \texttt{f} : le polynôme modulo.
-\end{itemize}
-
-\subsection*{Valeur de retour}
-
-La fonction retourne un polynôme correspondant à l'évaluation de $g(a)$ modulo $f$.
-
-\subsection*{Description}
-
-La fonction \texttt{horner} évalue un polynôme $g$ en un point $a$ modulo un polynôme $f$ en utilisant la méthode de Horner. Elle itère sur les coefficients de $g$ en partant du coefficient de plus haut degré et descend progressivement jusqu'au coefficient constant.
-
-La fonction initialise le résultat \texttt{res} avec le coefficient de plus haut degré de $g$. Ensuite, à chaque itération, elle met à jour le résultat en effectuant les opérations suivantes : multiplication du résultat actuel par $a$ modulo $f$, ajout du coefficient correspondant de $g$ et réduction modulo $f$.
-
-Finalement, la fonction retourne le résultat final \texttt{res} modulo $f$.
-
 
 \subsection{Algorithme de Brent et Kung}
 
-\begin{lstlisting}[frame=leftline, title={brent and kung}]
+\begin{lstlisting}[title={brent and kung}]
 def brentkung(g, a, f) :
 
 	ring = a.parent()
@@ -306,16 +206,18 @@ def brentkung(g, a, f) :
 	r = RR(d.sqrt()).ceil()
 	s = RR(d/r).ceil()
 
+    #calcul des puissances de a
 	ac = [ring(0)]*(r+1)
 	ac[0] = ring(1)
-
 	for i in range(1, r+1) :
 		ac[i] = (a*ac[i-1]) % f
 
+    #calcul du produit matriciel
 	ma = matrix(r, n, [(ac[i])[j] for i in range(r) for j in range(n)])
 	mg = matrix(s, r, [g[i*r+j] for i in range(s) for j in range(r)])
 	mb = mg*ma
 
+    #liste coefficients -> polynôme
 	b = [ring(0)]*s
 	for i in range(s) :
 		b[i] = ring(mb[i].list())
@@ -326,44 +228,6 @@ def brentkung(g, a, f) :
 	res = horner(b, ar, f)
 	return res
 \end{lstlisting}
-La fonction \texttt{brentkung} effectue l'évaluation d'un polynôme $g$ en un point $a$ modulo un polynôme $f$ en utilisant l'algorithme de Brent-Kung.
-
-\subsection*{Syntaxe}
-
-\begin{lstlisting}[language=Python]
-def brentkung(g, a, f)
-\end{lstlisting}
-
-\subsection*{Paramètres}
-
-\begin{itemize}
-  \item \texttt{g} : le polynôme à évaluer.
-  \item \texttt{a} : le point d'évaluation.
-  \item \texttt{f} : le polynôme modulo.
-\end{itemize}
-
-\subsection*{Valeur de retour}
-
-La fonction retourne un polynôme correspondant à l'évaluation de $g(a)$ modulo $f$.
-
-\subsection*{Description}
-
-La fonction \texttt{brentkung} utilise l'algorithme de Brent-Kung pour évaluer un polynôme $g$ en un point $a$ modulo un polynôme $f$.
-
-Tout d'abord, la fonction détermine les degrés $d$ et $n$ des polynômes $g$ et $f$, respectivement. Si le degré de $a$ est supérieur ou égal à $n$, une erreur est levée.
-
-Ensuite, la fonction calcule les valeurs de $r$ et $s$ en utilisant les opérations de plafonnement sur les racines carrées. Elle initialise une liste \texttt{ac} de longueur $r+1$ avec des zéros, et assigne la valeur $1$ à \texttt{ac[0]}.
-
-La boucle principale itère de $1$ à $r$ et met à jour les valeurs de \texttt{ac} en calculant les produits $a \times \texttt{ac}[i-1]$ modulo $f$.
-
-La fonction construit ensuite les matrices \texttt{ma} et \texttt{mg} à l'aide des coefficients des polynômes \texttt{ac} et \texttt{g}, respectivement.
-
-Elle multiplie les matrices \texttt{mg} et \texttt{ma} pour obtenir la matrice \texttt{mb}, puis extrait les lignes de \texttt{mb} pour construire la liste \texttt{b}.
-
-La variable \texttt{res} est initialisée avec le premier élément de \texttt{b}, et \texttt{ar} est définie comme le coefficient \texttt{ac[r]}.
-
-Enfin, la fonction utilise la méthode \texttt{horner} pour effectuer l'évaluation de \texttt{b} en \texttt{ar} modulo $f$, et retourne le résultat final.
-
 
 \subsection{Comparaison}
 
@@ -383,4 +247,5 @@ Enfin, la fonction utilise la méthode \texttt{horner} pour effectuer l'évaluat
 
 
 \end{document}
+
 
