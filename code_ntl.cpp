@@ -76,6 +76,7 @@ void init_poly_with_coeffs(zz_pX& poly, const vec_zz_p& coeffs) {
     }
 }
 
+
 //multiplication de deux polynomes par l'algorithme de karatsuba
 zz_pX karatsuba(const zz_pX& f, const zz_pX& g) {
     if (IsZero(f) || IsZero(g))
@@ -174,14 +175,27 @@ zz_pX brentkung(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
     for (long i = 1; i <= r; i++) {
         ac[i] = (a * ac[i - 1]) % f;
     }
+    //cout << "ac: " << ac << endl;
 
     mat_zz_p ma;
     ma.SetDims(r, n);
+    int p = 1;
+    int temp = 1;
     for (long i = 0; i < r; i++) {
         for (long j = 0; j < n; j++) {
-            ma[i][j] = rep((ac[i])[j]);
+            if(temp<p)
+              ma[i][j] = rep((ac[i])[j]);
+            else
+              ma[i][j] = 0;
+            temp++;
         }
+        temp = 0;
+        p = p+9;
     }
+     ma[0][0] = 1;
+    //cout << "matrice " << ma << endl;
+
+    //j'ai procédé de cette maniere car implicitement quand il y'a des cases qui n'existent pas dans le polynome ça générait des nombres quelconques et donc la fonction ne marche pas
 
     mat_zz_p mg;
     mg.SetDims(s, r);
