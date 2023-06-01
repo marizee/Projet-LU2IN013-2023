@@ -312,8 +312,22 @@ void polynomialDivision(const Polynome* dividend, const Polynome* divisor, Polyn
     }
 }
 
+//___________________________HORNER____________________________//
 
+/*Polynome* Horner(Polynome* g, Polynome* a, Polynome* f){
+        Polynome* res = g->coeff[g->n];
+        Polynome* quotient;
+        Polynome* remainder;
 
+        for(int i = g->n; i>=0; i--){
+            res = mult_naive(res,a);
+            polynomialDivision(res,f,quotient,remainder);
+            res = addition(remainder,g->coeff[i]);
+        }
+        polynomialDivision(res,f,quotient,remainder);
+       return remainder;
+
+}*/
 
 
 
@@ -322,13 +336,16 @@ void polynomialDivision(const Polynome* dividend, const Polynome* divisor, Polyn
 int main(){
     Polynome* p1 = initialiser_polynome();
     Polynome* p2 = initialiser_polynome();
+    //Polynome* p0 = initialiser_polynome();
     Polynome* p3 = karatsuba(p1,p2);
     Polynome* p4 = mult_naive(p1,p2);
     Polynome* p6 = mult_naive(p4,p1);
+    //Polynome* p5 = Horner(p1,p2,p0);
     
     printf("mult par karatsuba : "); affiche_polynome(p3);
     printf("mult naïve : "); affiche_polynome(p4);
     printf("mult naive : "); affiche_polynome(p6);
+    //printf("horner : "); affiche_polynome(p5);
 
     detruire_polynome(p1);
     detruire_polynome(p2);
