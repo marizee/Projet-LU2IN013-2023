@@ -69,11 +69,13 @@ zz_pX division_euclidienne(const zz_pX& f, const zz_pX& g) {
 }
 
 //fonction auxiliaire 
-void init_poly_with_coeffs(zz_pX& poly, const vec_zz_p& coeffs) {
+zz_pX init_poly_with_coeffs(const vec_zz_p& coeffs) {
     long n = coeffs.length();
+    zz_pX poly;
     for (long i = 0; i < n; i++) {
         SetCoeff(poly, i, coeffs[i]);
     }
+    return poly;
 }
 
 
@@ -208,20 +210,15 @@ zz_pX brentkung(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
     mat_zz_p mb;
     mb = mg * ma;
 
-    vec_zz_pX b;
-    b.SetLength(s);
-    for (long i = 0; i < s; i++) {
-          init_poly_with_coeffs(b[i],mb[i]);
-    }
 
     zz_pX res;
-    res = b[0];
+    res = init_poly_with_coeffs(mb[0]);
     zz_pX ar = ac[r];
     
     zz_pX tmp = ar;
 
     for (long i = 1; i < s; i++) {
-        res += (b[i] * tmp) % f;
+        res += (init_poly_with_coeffs(mb[i]) * tmp) % f;
         tmp = ar * tmp;
     }
 
