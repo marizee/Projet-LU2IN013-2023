@@ -157,8 +157,7 @@ zz_pX horner(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
     return res;
 }
 
-//composition modulaire brent et kung ne marche pas bien pour l'instant
-//ne donne pas les bons coefs et pas performant en compléxité pour les polynomes à degré modéré ou plus petit
+
 zz_pX brentkung(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
 
     long d = deg(g) + 1;
@@ -230,6 +229,69 @@ zz_pX brentkung(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
 
     return res;
 }
+
+zz_pX nusken(const zz_pX& g, const zz_pX& a, const zz_pX& f)
+{
+    cout << "Temps pour nusken : " <<endl;
+    long d = sqrt(g.rep.length() + 1);
+
+    // Réécriture
+    zz_pX ringY;
+    ringY.SetMaxLength(g.rep.length());
+    for (long i = 0; i <= g.rep.length(); i++) {
+        ringY.rep[i] = g.rep[i];
+    }
+    // Calcul du produit matriciel
+    mat_zz_p mg;
+    mg.SetDims(d, d);
+    for (long j = 0; j < d; j++) {
+        for (long i = 0; i < d; i++) {
+            mg[i][j] = ringY[i+d*j];
+        }
+    }
+
+    vec_zz_pX ac;
+    ac.SetLength(d);
+    ac[0] = 1;
+    for (long i = 1; i < d; i++) {
+        ac[i] = (a * ac[i-1]) % f;
+    }
+
+    vec_zz_pX ma = ac;
+
+    vec_zz_pX mr;
+    mr.SetLength(d);
+    for (long i = 0; i < d; i++) {
+        mr[i] = 0;
+        for (long j = 0; j < d; j++) {
+            mr[i] += mg[i][j] * ma[j];
+        }
+    }
+
+    vec_zz_pX r;
+    r.SetLength(d);
+    for (long i = 0; i < d; i++) {
+        r[i] = mr[i] % f;
+    }
+
+    // Calcul des autres puissances de a
+    vec_zz_pX aj;
+    aj.SetLength(d);
+    for (long j = 0; j < d; j++) {
+        aj[j] = power(a, d*j) % f;
+    }
+
+    // Calcul du résultat
+    zz_pX res = to_zz_pX(0);
+    for (long j = 0; j < d; j++) {
+        res += r[j] * aj[j] % f;
+    }
+
+    ringY.kill();
+
+    return res;
+}
+
 
 //________________________________LES TESTS_______________________________//
 int main () 
@@ -310,6 +372,16 @@ int main ()
     tendbk2 = GetTime();
 		std::cout << "g(a) mod f = " << result << std::endl;
 		std::cout << "time brentkung2: " << tendbk2 - tstartbk2 << std::endl;
+
+    // Appel de la fonction nusken
+    double tstartnk, tendnk;
+    tstartnk = GetTime();
+    zz_pX nuskenziegler = nusken(g, a, f);
+    tendnk = GetTime();
+
+    // Affichage du résultat
+    cout << "nusken: " << nuskenziegler << endl;
+    cout << "Temps pour nusken : " << tendnk - tstartnk << endl;
 
     p1.kill();
     p2.kill();
