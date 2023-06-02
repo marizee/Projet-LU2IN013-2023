@@ -188,6 +188,9 @@ zz_pX brentkung(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
     int temp = 1;
     for (long i = 0; i < r; i++) {
         for (long j = 0; j < n; j++) {
+            //Vincent: je ne comprends pas trop le role de p ici (surtout p = p+9 semble tres particulier),
+            //Vincent: -> une solution serait de faire aller la boucle jusqu'a j <= deg(a[i])
+            //Vincent: (noter que la matrice est deja initialisee a zero quand on fait "SetDims")
             if(temp<p)
               ma[i][j] = rep((ac[i])[j]);
             else
@@ -222,9 +225,9 @@ zz_pX brentkung(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
 
     for (long i = 1; i < s; i++) {
         res += (init_poly_with_coeffs(mb[i]) * tmp) % f;
-				//Vincent: attention ! ici meme probleme que dans l'evaluation naive:
-				//Vincent: il n'y a pas "% f" donc le degré de "tmp" va devenir très
-				//Vincent: gros au fur et à mesure des itérations de la boucle
+        //Vincent: attention ! ici meme probleme que dans l'evaluation naive:
+        //Vincent: il n'y a pas "% f" donc le degré de "tmp" va devenir très
+        //Vincent: gros au fur et à mesure des itérations de la boucle
         tmp = ar * tmp;
     }
 
@@ -332,7 +335,7 @@ int main ()
     random(g, d);
     random(f, d);
     //random(a, e);
-		//Vincent: en general, pour le cas Brent-Kung, on prend deg(a) < d-1
+    //Vincent: en general, pour le cas Brent-Kung, on prend deg(a) < d-1
     random(a, d-1);
 
     double tstart, tend;
