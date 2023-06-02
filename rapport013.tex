@@ -1,3 +1,4 @@
+%! TEX program = xelatex
 \documentclass[a4paper]{article}
 \usepackage{amsmath, amssymb, mathtools}
 \usepackage{amsthm}
@@ -73,7 +74,7 @@
 \section{NOTIONS ET NOTATIONS}
 
 
-\subsection{Airthmétique modulaire}
+\subsection{Arithmétique modulaire}
 
 Corps d'étude : ${\mathbb{Z}/p \mathbb{Z}}$
 
@@ -83,7 +84,7 @@ addition, soustraction, division euclidienne
 \section{Multiplication}
 
 Dans cette section, on étudie deux algorithmes qui calculent le produit de deux polynômes univariés.
-Comprendre comment améliorer les perfomances d'un algorithme et les manipulations possibles sur les polynômes.
+Comprendre comment améliorer les performances d'un algorithme et les manipulations possibles sur les polynômes.
 
 
 Soient deux polynômes $f$,g $\in \mathbb{Z}/p\mathbb{Z}[\mathrm{X}]$ de degré strictement inférieur à $n-1$ :
@@ -116,19 +117,25 @@ Cet algorithme est donc en $O(n^2)$
 
 \subsection{Algorithme de Karatsuba}
 
-L'amélioration proposée par Karastuba repose sur le fait de scinder les polynomes selon :
+L'amélioration proposée par Karatsuba repose sur le fait de scinder les polynomes selon :
 \[
 f=f^{(0)}+f^{(1)}\mathrm{X}^k\text{ et }\mathrm{g} = \mathrm{g}^{(0)}+\mathrm{g}^{(1)}\mathrm{X}^k
 \]
 avec $f^{(0)}, f^{(1)}, \mathrm{g}^{(0)}, \mathrm{g}^{(1)}$ de degrés au plus k-1, k=$\lceil n/2 \rceil$. Le produit s'écrit alors :
 \[
-fg = f^{(0)}g^{(0)}+(f^{(0)}g^{(1)}+f^{(1)}g^{(0)})\mathrm{X}^k+f^{(0)}g^{(1)}\mathrm{X}^{2k} 
+fg = f^{(0)}g^{(0)}+(f^{(0)}g^{(1)}+f^{(1)}g^{(0)})\mathrm{X}^k+f^{(1)}g^{(1)}\mathrm{X}^{2k} 
 \]
 Les opérations associées à l'algorithme permettent de gagner une multiplication par rapport à l'algorithme naïf. Par le biais des appels récursifs, ce gain se retrouve dans la puissance de l'exposant.
-Ainsi, l'algorithme de Karastuba est en $O(n^{log_2(3)}) = O(n^{1,59})$
+Ainsi, l'algorithme de Karatsuba est en $O(n^{log_2(3)}) = O(n^{1,59})$
+
+\[
+  fg = f^{(0)}g^{(0)}
+  +\left((f^{(0)}+f^{(1)}) (g^{(0)} + g^{(1)}) - f^{(0)}g^{(0)} - f^{(1)}g^{(1)}\right)\mathrm{X}^k+
+  f^{(1)}g^{(1)}\mathrm{X}^{2k} 
+\]
 
 
-\begin{lstlisting}[title={karastuba}]
+\begin{lstlisting}[title={karatsuba}]
 def karatsuba(f, g) :
     ring = f.parent()
 
@@ -136,7 +143,7 @@ def karatsuba(f, g) :
     if f.is_zero() : return f
     if g.is_zero() : return g
     
-    #seuil à partir duquel la multiplication naïve est plus perfomante
+    #seuil à partir duquel la multiplication naïve est plus performante
     if (f.degree() <= 10 and g.degree() <= 10) : 
         return mult_naive(f, g)
 
@@ -158,13 +165,16 @@ def karatsuba(f, g) :
 \end{lstlisting}
 
 
-\subsection{Comparaison perfomances}
+\subsection{Comparaison performances}
 
 \cite{aecf} Ces algorithmes sont complémentaires et non en compétition. En effet, pour des polynomes de degré inférieurs à 20 (?????) , on préfèrera l'algorithme naïfs.
 
-Perfomances : inserer tableau de comparaison  (seuil = ??????)
+Performances : inserer tableau de comparaison  (seuil = ??????)
 
 \section{ALGORITHMES DE COMPOSITION MODULAIRE}
+
+Rappeler le probleme
+
 \subsection{Algorithme naïf}
 
 \begin{lstlisting}[title={naive}]
@@ -194,6 +204,8 @@ def horner(g, a, f) :
 \end{lstlisting}
 
 \subsection{Algorithme de Brent et Kung}
+
+\cite{BrentKung1978}
 
 \begin{lstlisting}[title={brent and kung}]
 def brentkung(g, a, f) :
@@ -234,10 +246,14 @@ def brentkung(g, a, f) :
 
 \section{ALGORITHME DE NUSKEN ET ZIEGLER}
 
+\cite{NuskenZiegler2004}
 
 
 \newpage
 \section{BIBLIOGRAPHIE}
+
+\bibliographystyle{plain}
+\bibliography{biblio}
 
 \begin{thebibliography}{10}
     \bibitem{aecf} Alin Bostan, Frédéric Chyzak, Marc Giusti, Romain Lebreton, Grégoire Lecerf, Bruno Salvy, Eric Schost,

@@ -113,7 +113,7 @@ field = FiniteField(97)
 ring.<x> = PolynomialRing(field)
 
 print("Comparaisons temps")
-print("df\tda\tdg\tsage\tnaive\thorner\tbrent&kung")
+print("df\tda\tdg\tsage\tnaive\tnaiimp\thorner\tbrent&kung")
 for e in range(1, 10) :
 	df = 2**e; da = ceil(df/2.); dg = ceil(df/1.5)
 	f = ring.random_element(df)
@@ -131,7 +131,12 @@ for e in range(1, 10) :
 	tnaive = te - ts
 
 	ts = time.time()
-	horner = eval_naive_improved(g, a, f)
+	naive_improved = eval_naive_improved(g, a, f)
+	te = time.time()
+	tnaiveimp = te - ts
+
+	ts = time.time()
+	hor = horner(g, a, f)
 	te = time.time()
 	thorner = te - ts
 
@@ -140,7 +145,7 @@ for e in range(1, 10) :
 	te = time.time()
 	tbk = te - ts
 
-	print(f'{df}\t{da}\t{dg}\t{tsage:.5f}\t{tnaive:.5f}\t{thorner:.5f}\t{tbk:.5f}')
+	print(f'{df}\t{da}\t{dg}\t{tsage:.5f}\t{tnaive:.5f}\t{tnaiveimp:.5f}\t{thorner:.5f}\t{tbk:.5f}')
 
 print("df\tda\tdg\thorner\tbrent&kung")
 for e in range(10, 15) :
