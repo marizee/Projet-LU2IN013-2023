@@ -15,6 +15,8 @@ def nusken(g, a, f) :
         ac[i] = (a*ac[i-1]) % f
 
     ma = vector(ac)
+    print(mg)
+    print(ma)
     
     mr = mg*ma
 
@@ -38,11 +40,12 @@ def nusken(g, a, f) :
 R.<X> = PolynomialRing(FiniteField(97))
 S.<x,y> = PolynomialRing(FiniteField(97))
 
-f = R.random_element(10)
-a = R.random_element(8)
-g = S.random_element(8,8)
+f = R.random_element(20)
+a = R.random_element(18)
+g = S.random_element(4,terms=Infinity)
 print("f : ", f, "\na : ", a, "\ng : ", g)
 
 p = g(X, a)%f
 q = nusken(g, a, f)
 print("p : ", p, "\nq : ", q)
+print(f"content ? {p == q}")
