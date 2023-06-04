@@ -16,9 +16,7 @@ zz_pX addition(const zz_pX& f, const zz_pX& g) {
     zz_pX res;
     SetCoeff(res, dmin, coeff(f, dmin) + coeff(g, dmin));
 
-    // Vincent: pourquoi boucle "decroissante" de dmin-1 a 0, et pas de 0 a dmin-1?
-    // Vincent: (ce n'est pas forcement la meme chose pour les performances, on peut en discuter si vous voulez)
-    for (long i = dmin - 1; i >= 0; i--) {
+    for (long i = 0; i < dmin; i++) {
         SetCoeff(res, i, coeff(f, i) + coeff(g, i));
     }
 
@@ -45,9 +43,7 @@ zz_pX soustraction(const zz_pX& f, const zz_pX& g) {
     zz_pX res;
     SetCoeff(res, dmin, coeff(f, dmin) - coeff(g, dmin));
 
-    // Vincent: pourquoi boucle "decroissante" de dmin-1 a 0, et pas de 0 a dmin-1?
-    // Vincent: (ce n'est pas forcement la meme chose pour les performances, on peut en discuter si vous voulez)
-    for (long i = dmin - 1; i >= 0; i--) {
+    for (long i = 0; i < dmin; i++) {
         SetCoeff(res, i, coeff(f, i) - coeff(g, i));
     }
 
@@ -184,27 +180,13 @@ zz_pX brentkung(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
 
     mat_zz_p ma;
     ma.SetDims(r, n);
-    int p = 1;
-    int temp = 1;
     for (long i = 0; i < r; i++) {
-        for (long j = 0; j < n; j++) {
-            //Vincent: je ne comprends pas trop le role de p ici (surtout p = p+9 semble tres particulier),
-            //Vincent: -> une solution serait de faire aller la boucle jusqu'a j <= deg(a[i])
-            //Vincent: (noter que la matrice est deja initialisee a zero quand on fait "SetDims")
-            if(temp<p)
+        for (long j = 0; j <= deg(ac[i]); j++) {
               ma[i][j] = rep((ac[i])[j]);
-            else
-              ma[i][j] = 0;
-            temp++;
         }
-        temp = 0;
-        p = p+9;
     }
      ma[0][0] = 1;
-    //cout << "matrice " << ma << endl;
-
-    //j'ai procédé de cette maniere car implicitement quand il y'a des cases qui n'existent pas dans le polynome ça générait des nombres quelconques et donc la fonction ne marche pas
-
+    
     mat_zz_p mg;
     mg.SetDims(s, r);
     for (long i = 0; i < s; i++) {
@@ -225,10 +207,7 @@ zz_pX brentkung(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
 
     for (long i = 1; i < s; i++) {
         res += (init_poly_with_coeffs(mb[i]) * tmp) % f;
-        //Vincent: attention ! ici meme probleme que dans l'evaluation naive:
-        //Vincent: il n'y a pas "% f" donc le degré de "tmp" va devenir très
-        //Vincent: gros au fur et à mesure des itérations de la boucle
-        tmp = ar * tmp;
+        tmp = (ar * tmp) % f;
     }
 
     ar.kill();
@@ -242,19 +221,17 @@ zz_pX brentkung(const zz_pX& g, const zz_pX& a, const zz_pX& f) {
 
 zz_pX nusken(const zz_pX& g, const zz_pX& a, const zz_pX& f)
 {
-    long d = sqrt(g.rep.length() + 1);
+    int d = sqrt(deg(g) + 1);
 
     // Réécriture
     zz_pX ringY;
-    ringY.SetMaxLength(g.rep.length());
-    for (long i = 0; i <= g.rep.length(); i++) {
-        ringY.rep[i] = g.rep[i];
-    }
+    ringY = g;
+
     // Calcul du produit matriciel
     mat_zz_p mg;
     mg.SetDims(d, d);
-    for (long j = 0; j < d; j++) {
-        for (long i = 0; i < d; i++) {
+    for (int j = 0; j < d; j++) {
+        for (int i = 0; (i < d) && ((i+d*j)<=deg(ringY)); i++) {
             mg[i][j] = ringY[i+d*j];
         }
     }
@@ -262,7 +239,7 @@ zz_pX nusken(const zz_pX& g, const zz_pX& a, const zz_pX& f)
     vec_zz_pX ac;
     ac.SetLength(d);
     ac[0] = 1;
-    for (long i = 1; i < d; i++) {
+    for (int i = 1; i < d; i++) {
         ac[i] = (a * ac[i-1]) % f;
     }
 
@@ -270,33 +247,27 @@ zz_pX nusken(const zz_pX& g, const zz_pX& a, const zz_pX& f)
 
     vec_zz_pX mr;
     mr.SetLength(d);
-    for (long i = 0; i < d; i++) {
+    for (int i = 0; i < d; i++) {
         mr[i] = 0;
-        for (long j = 0; j < d; j++) {
-            mr[i] += mg[i][j] * ma[j];
+        for (int j = 0; j < d; j++) {
+            mr[i] += (mg[i][j] * ma[j]) % f;
         }
-    }
-
-    vec_zz_pX r;
-    r.SetLength(d);
-    for (long i = 0; i < d; i++) {
-        r[i] = mr[i] % f;
     }
 
     // Calcul des autres puissances de a
     vec_zz_pX aj;
     aj.SetLength(d);
-    for (long j = 0; j < d; j++) {
+    for (int j = 0; j < d; j++) {
         aj[j] = power(a, d*j) % f;
     }
 
     // Calcul du résultat
     zz_pX res = to_zz_pX(0);
-    for (long j = 0; j < d; j++) {
-        res += r[j] * aj[j] % f;
+    for (int j = 0; j < d; j++) {
+        res += (mr[j] * aj[j]) % f;
     }
 
-    ringY.kill();
+    //ringY.kill();
 
     return res;
 }
@@ -329,56 +300,49 @@ int main ()
     //cout << "p1 / p2 = " << p5 << endl;
 
     // Mesurer le temps :
-    long d = 300;
+    long d = 100;
     long e = 10;
     zz_pX g, f, a;
     random(g, d);
     random(f, d);
-    //random(a, e);
-    //Vincent: en general, pour le cas Brent-Kung, on prend deg(a) < d-1
-    random(a, d-1);
+    random(a, e);
 
     double tstart, tend;
     tstart = GetTime();
     zz_pX mult = g * f;
     tend = GetTime();
-    if (d < 150)
-        cout << "m * n = " << mult << endl;
+    cout << "m * n = " << mult << endl;
     cout << "Temps pour multiplication : " << tend - tstart << endl;
     
     double tstartk, tendk;
     tstartk = GetTime();
     zz_pX result_karatsuba = karatsuba(g, f);
     tendk = GetTime();
-    if (d < 150)
-        cout << "karatsuba(g, f) = " << result_karatsuba << endl;
+    cout << "karatsuba(g, f) = " << result_karatsuba << endl;
     cout << "Temps pour karatsuba : " << tendk - tstartk << endl;
 
     double tstartn, tendn;
     tstartn = GetTime();
-    zz_pX result_naive = eval_naive(g, a, f);
-    tendn = GetTime();
-    if (d < 150)
-        std::cout << "g(a) mod f = " << result_naive << std::endl;
-    std::cout << "time algo naive: " << tendn - tstartn << std::endl;
+		zz_pX result_naive = eval_naive(g, a, f);
+		tendn = GetTime();
+		std::cout << "g(a) mod f = " << result_naive << std::endl;
+		std::cout << "time algo naive: " << tendn - tstartn << std::endl;
 
     double tstarth, tendh;
     tstarth = GetTime();
-    zz_pX result_horner = horner(g, a, f);
-    tendh = GetTime();
-    if (d < 150)
-        std::cout << "g(a) mod f = " << result_horner << std::endl;
-    std::cout << "time horner: " << tendh - tstarth << std::endl;
+		zz_pX result_horner = horner(g, a, f);
+		tendh = GetTime();
+		std::cout << "g(a) mod f = " << result_horner << std::endl;
+		std::cout << "time horner: " << tendh - tstarth << std::endl;
 
 
     double tstartbk, tendbk;
     zz_pX x;
     tstartbk = GetTime();
-    zz_pX result_brentkung = brentkung(g, a, f);
-    tendbk = GetTime();
-    if (d < 150)
-        std::cout << "g(a) mod f = " << result_brentkung << std::endl;
-    std::cout << "time brentkung: " << tendbk - tstartbk << std::endl;
+		zz_pX result_brentkung = brentkung(g, a, f);
+		tendbk = GetTime();
+		std::cout << "g(a) mod f = " << result_brentkung << std::endl;
+		std::cout << "time brentkung: " << tendbk - tstartbk << std::endl;
 
 
     double tstartbk2, tendbk2;
@@ -386,9 +350,8 @@ int main ()
     zz_pX result;
     CompMod(result, g, a, f);
     tendbk2 = GetTime();
-    if (d < 150)
-        std::cout << "g(a) mod f = " << result << std::endl;
-    std::cout << "time brentkung2: " << tendbk2 - tstartbk2 << std::endl;
+		std::cout << "g(a) mod f = " << result << std::endl;
+		std::cout << "time brentkung2: " << tendbk2 - tstartbk2 << std::endl;
 
     // Appel de la fonction nusken
     double tstartnk, tendnk;
@@ -397,8 +360,7 @@ int main ()
     tendnk = GetTime();
 
     // Affichage du résultat
-    if (d < 150)
-        cout << "nusken: " << nuskenziegler << endl;
+    cout << "nusken: " << nuskenziegler << endl;
     cout << "Temps pour nusken : " << tendnk - tstartnk << endl;
 
     p1.kill();
