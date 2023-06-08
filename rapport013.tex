@@ -11,6 +11,7 @@
 \usepackage{listings}
 \usepackage{color}
 \usepackage{graphicx}
+\usepackage{enumitem}
 
 \fancyhead[L, C, R]{}
 \fancyfoot[L, R]{}
@@ -76,10 +77,19 @@
 
 \subsection{Arithmétique modulaire}
 
-Corps d'étude : ${\mathbb{Z}/p \mathbb{Z}}$
+\begin{itemize}[label=$\star$]
+ \item Corps d'étude : ${\mathbb{Z}/p \mathbb{Z}}$
+Notre étude porte principalement sur les opérations des polynomes dans l'anneau $Z/pZ$ , où p est un nombre premier, on travaille avec des polynômes à coefficients modulo p. Cela présente plusieurs avantages comme :
+	\begin{itemize}
 
+  		\item réduction des calculs à des opérations arithmétiques plus simples sur des entiers avec le modulo p.
+  		\item simplification et limitations de la taille des coefficients pour obtenir des résultats plus facilement et permet d'exploiter des propriétés spécifiques de l'arithmétique modulaire.
+  
+	\end{itemize}
+	
+ \item Division euclidienne
 
-addition, soustraction, division euclidienne
+\end{itemize}
 
 \section{Multiplication}
 
@@ -87,7 +97,7 @@ Dans cette section, on étudie deux algorithmes qui calculent le produit de deux
 Comprendre comment améliorer les performances d'un algorithme et les manipulations possibles sur les polynômes.
 
 
-Soient deux polynômes $f$,g $\in \mathbb{Z}/p\mathbb{Z}[\mathrm{X}]$ de degré strictement inférieur à $n-1$ :
+Soient deux polynômes $f$,g $\in \mathbb{Z}/p\mathbb{Z}[\mathrm{X}]$ de degré strictement inférieur à $n$ :
 \[
 f=f_0+f_1\mathrm{X}+...+f_{n-1}\mathrm{X}^{n-1}\text{ et g}=\mathrm{g}_0+\mathrm{g}_1\mathrm{X}+...+\mathrm{g}_{n-1}\mathrm{X}^{n-1}
 \]
@@ -98,7 +108,8 @@ Ce premier algorithme consiste à simplement développer le produit des coeffici
 \[
 f\text{g}=\sum_{i=0}^{2n-2} (\sum_{j+k=i}f_j\mathrm{g}_k) \mathrm{X}^i
 \]
-Cet algorithme est donc en $O(n^2)$
+Cet algorithme est donc en $O(n^2)$. Pour multiplier deux polynômes de degrés \textit{m} et \textit{n}, l'algorithme naïf demande au plus (\textit{m}+1)\textsf{x}(\textit{n}+1) multiplications dans $\mathbb{A}$ et
+\textit{mn} additions dans $\mathbb{A}$
 
 \begin{lstlisting}[title={multiplication naive}]
     def mult_naive(f, g) :
@@ -169,12 +180,12 @@ def karatsuba(f, g) :
 
 \cite{aecf} Ces algorithmes sont complémentaires et non en compétition. En effet, pour des polynomes de degré inférieurs à 20 (?????) , on préfèrera l'algorithme naïfs.
 
-Performances : inserer tableau de comparaison  (seuil = ??????)
+Performances : insérer tableau de comparaison  (seuil = ??????)
 
 \section{ALGORITHMES DE COMPOSITION MODULAIRE}
 
-Rappeler le probleme
-
+ Dans cette autre section du rapport, on s'intéresse à l'étude et la comparaison de trois algorithmes de composition modulaire qui calculent g(a) mod f avec $f$,g $\in \mathbb{Z}/p\mathbb{Z}[\mathrm{X}]$ de degré $n$ et a de degré $n$
+ 
 \subsection{Algorithme naïf}
 
 \begin{lstlisting}[title={naive}]
@@ -205,7 +216,9 @@ def horner(g, a, f) :
 
 \subsection{Algorithme de Brent et Kung}
 
-\cite{BrentKung1978}
+Étant donnés $\text{f}\in\mathbb{K}[\mathrm{X}]$ de degré n, a dans $\mathbb{K}[\mathrm{X}]_{<n}$ et \text{g} dans $\mathbb{K}[\mathrm{Y}]_{<n}$, l'algorithme de \text{Brent et Kung} calcule \text{g(a)}  mod \text{f} avec une complexité en \text{\~O}$((1+\text{n/d})d^{\omega_{2}/2})$. $\omega$ représente le plus petit nombre réel tels que deux matrices $\textit{n}\times\textit{n}$ peuvent être multipliées en $O(\textit{n}^{\omega+\epsilon})$ opérations pour tout $\epsilon>0$. 
+
+L'algorithme de \text{Brent et Kung} met en avant l'impact de la multiplication de matrices rectangulaires et à quel point la vitesse d'exécution dépend du degré de \text{f et de g}. Il peut etre vu comme une introduction à  l'algorithme de \text{Nusken-Ziegler} qui généralise cette approche à un polynome \text{g} à deux variables.
 
 \begin{lstlisting}[title={brent and kung}]
 def brentkung(g, a, f) :
@@ -246,8 +259,45 @@ def brentkung(g, a, f) :
 
 \section{ALGORITHME DE NUSKEN ET ZIEGLER}
 
-\cite{NuskenZiegler2004}
+\begin{lstlisting}[title={nusken et ziegler}]
 
+def nusken(g, a, f) :
+    ring = a.parent()
+    d = RR(sqrt(g.degree()+1)).ceil()
+
+    #réécriture
+    ringY = g.parent().univariate_ring(y)
+    lg = ringY(g)
+
+    #calcul du produit matriciel
+    mg = matrix(d, d, [lg[i+d*j](X) for j in range(d) for i in range(d) ])
+
+    ac = [ring(0)]*d
+    ac[0] = ring(1)
+    for i in range(1, d) :
+        ac[i] = (a*ac[i-1]) % f
+
+    ma = vector(ac)
+    
+    mr = mg*ma
+
+    r = [ring(0)]*d
+    for j in range(d) :
+        r[j] = ring(mr[j].list()) %f
+    
+    #calcul des autres puissances de a
+    aj = [ring(0)]*d
+    for j in range(d) :
+        aj[j] = a**(d*j) %f
+
+    #calcul du resultat
+    res = ring(0)
+    for j in range(d) :
+        res += r[j]*aj[j] %f
+
+    return res
+
+\end{lstlisting}
 
 \newpage
 \section{BIBLIOGRAPHIE}
