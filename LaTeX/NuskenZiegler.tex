@@ -1,0 +1,259 @@
+\documentclass[11pt,a4paper,reqno]{amsart}
+%
+\usepackage[a4paper,centering]{geometry}
+\geometry{width=160mm}  % fixe \textwidth
+\geometry{height=257mm} % fixe \textheight
+%
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{fancyhdr,lastpage,ifthen}
+\usepackage{enumitem}
+
+\usepackage[kw]{pseudo}
+
+\usepackage[symbol]{footmisc}
+
+\usepackage{calrsfs}
+
+%%% some macros <<:
+% ---- SHOW SOLUTIONS ---- <<:
+\newif\ifShowSolutions
+\ShowSolutionstrue
+% Comment/Uncomment next line to show/hide solutions
+%\ShowSolutionsfalse
+\newcommand{\hint}[2]{\noindent [\emph{#1}: #2]}
+% :>> SHOW SOLUTIONS
+%% ---- MISC ---- <<:
+\newcommand{\field}{\mathbb{K}} % space of polynomial matrices
+\newcommand{\pring}{\field[x]} % ring of polynomials
+\newcommand{\pmatspace}[2]{\pring^{#1\times #2}} % space of polynomial matrices
+\newcommand{\fracfield}{\field(x)} % field of rational fractions
+\newcommand{\fmatspace}[2]{\fracfield^{#1\times #2}} % space of rational fraction matrices
+\newcommand{\bigO}[1]{O(#1)} % complexity bound O(.)
+\newcommand{\softO}[1]{\tilde{O}(#1)} % complexity bound O~(.)
+\newcommand{\softOBig}[1]{\tilde{O}\left(#1\right)} % complexity bound O~(.)
+\newcommand{\ZZp}{\mathbb{Z}_{>0}} %  positive integers
+\newcommand{\timepm}[1]{\mathsf{M}(#1)} % time for polynomial multiplication
+%% :>> MISC
+%% :>> some macros
+
+\def\pFqnoargs#1#2{{}_#1F_#2}
+\def\pFq#1#2#3#4#5#6{\pFqnoargs{#1}{#2}\biggl(\begin{matrix}%
+{#3}\kern.707em{#4}\\{#5}%
+\end{matrix}\,\bigg|\,#6\biggr)}
+
+
+\title{Exercise on N\"usken-Ziegler algorithm}
+%
+\setlength{\headheight}{0pt}
+\fancyhead[L]{}
+\fancyhead[C]{}
+\fancyhead[R]{}
+\fancyfoot[L]{}
+\fancyfoot[C]{\vspace{1mm}\thepage/\pageref{LastPage}}
+\fancyfoot[R]{\vspace{1mm}\ifthenelse{\not\(\value{page}=\pageref{LastPage}\)}{\emph{Please turn the page}}{}}
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\footrulewidth}{1pt}
+\pagestyle{fancy}
+%
+\begin{document}
+
+\maketitle
+
+\thispagestyle{fancy}
+
+\section{Multipoint evaluation of bivariate polynomials}
+
+We consider the following two algorithmic problems:
+
+\smallskip
+%
+\textsf{BivMPEval}: Given parameters \(n,d_x,d_y \in \ZZp\), given \(n\) points
+$(a_1,b_1),\ldots,(a_n,b_n)$ in \(\field^2\) with the \(a_i\)'s pairwise
+distinct, given a polynomial \(F(x,y) \in \field[x,y]\) with \(\deg_x(F) <
+d_x\) and \(\deg_y(F) < d_y\), compute the evaluations
+\(F(a_1,b_1),\ldots,F(a_n,b_n)\).
+
+\smallskip
+
+This is bivariate multipoint evaluation, with the restriction that the
+\(x\)-coordinates are distinct. At the price of some ``mild randomization'',
+one can reduce to this situation from the general case of \(n\) distinct
+points; this reduction will not be discussed here.
+
+\smallskip
+%
+\textsf{BivModComp}: Given parameters \(n,d_x,d_y \in \ZZp\), given a
+polynomial \(F(x,y) \in \field[x,y]\) with \(\deg_x(F) < d_x\) and \(\deg_y(F)
+< d_y\), given polynomials \(P,Q \in \pring\) with \(\deg(P) < \deg(Q) = n\),
+compute the modular composition \(F(x,P(x)) \bmod Q(x)\).
+
+\smallskip
+
+This is one type of bivariate extension of the modular composition of
+univariate polynomials.
+
+\begin{enumerate}
+  \setlength\itemsep{2pt}
+  \item
+
+    Give a complexity bound for a naive algorithm for \textsf{BivMPEval}, which
+    performs \(n\) evaluations of \(F\) at a single point.
+
+  \item
+
+    Exploiting the polynomials \(Q = \prod_{1\le i\le n} (x-a_i)\) and \(P \in
+    \pring_{<n}\) such that \(P(a_i) = b_i\) for \(1\le i \le n\), prove that:
+    from an algorithm \(\mathcal{A}\) for \textsf{BivModComp} with complexity
+    \(\mathsf{C}(n,d_x,d_y)\), one can derive an algorithm \(\mathcal{B}\) for
+    \textsf{BivMPEval} whose complexity is bounded by \(\mathsf{C}(n,d_x,d_y) +
+    \bigO{\timepm{n}\log(n)}\).
+
+    %%\noindent\hint{Hint}{what can you say about
+    %%\(R(a_i)\), for \(R(x) = F(x,P(x)) \bmod Q(x)\)?}
+    %\(R(a_i) = F(a_i,b_i)\) for \(1 \le i \le n\)
+
+  \item
+
+    Give an algorithm for \textsf{BivModComp} based on the writing \(F =
+    \sum_{j < d_y} F_j(x) y^j\) and on ``naive'' evaluation at \(y=P \bmod Q\).
+    Show that its complexity is in \(\bigO{d_y \timepm{d_x} + d_y\timepm{n}}\),
+    and give a range for \((d_x,n)\) for which this is quasi-linear in the
+    input size.
+\end{enumerate}
+
+From here on, we focus on the case \(d_x \in \bigO{n}\). Our goal is to obtain
+a better complexity bound for \textsf{BivModComp} (thus also for
+\textsf{BivMPEval}) than the one \(\bigO{d_y\timepm{n}}\) from Question~(3).
+
+\begin{enumerate}[resume]
+  \item
+
+    If \(d_y \in \bigO{n}\) and \(d_x = 1\), do you know a better complexity
+    bound for \textsf{BivModComp}?
+    %%If \(d_y \in \bigO{n}\) and \(d_x = 1\), the above bound becomes
+    %%\(\bigO{n\timepm{n}}\). Are you aware of a better complexity bound for
+    %%\textsf{BivModComp} in this specific case?
+  \item
+    For simplicity, we now also assume (in addition to \(d_x \in \bigO{n}\))
+    that \(d_y\) is a square \(d_y = \delta^2\) with \(\delta\in\ZZp\). Writing
+    \(F = \sum_{j<\delta} \left( \sum_{i<\delta} F_{i+\delta j}(x) y^i \right)
+    y^{\delta j}\), give an algorithm for \textsf{BivModComp} which exploits
+    polynomial matrix multiplication.
+
+    \noindent
+    \hint{Hint}{compute \(\sum_{i<\delta} F_{i+\delta j}(x) P^i \bmod Q\)
+    simultaneously for all \(j\) via the multiplication of a \(\delta \times
+    \delta\) univariate matrix of degree \(<d_x\) by a \(\delta \times 1\)
+  univariate vector of degree \(<n\).}
+
+  \item
+
+    Recall how to perform the above matrix-vector product using
+    \(\bigO{\delta^\omega \timepm{\frac{n}{\delta} + d_x}}\) operations in
+    \(\field\). Deduce that the algorithm of Question~(5) costs \(\bigO{\delta
+    \timepm{n} + \delta^\omega \timepm{\frac{n}{\delta} + d_x}}\).
+
+  \item
+
+    As soon as \(d_x \in \bigO{\frac{n}{\delta}}\) (in particular, in the
+    frequent case \(d_x d_y \in \Theta(n)\)), the above bound is within
+    \(\bigO{\delta^{\omega-1} \timepm{n}}\). How does this compare to
+    \(\bigO{d_y \timepm{n}}\)?
+\end{enumerate}
+
+\ifShowSolutions
+%
+\textbf{Solution:}
+\begin{enumerate}
+  \item
+
+    The evaluation of \(F\) at a single point \((a_i,b_i)\) costs \(\bigO{d_x
+    d_y}\) operations in \(\field\). Evaluating naively at each point
+    independently will thus cost \(\bigO{n d_x d_y}\) operations in \(\field\).
+
+  \item 
+
+    Define the \emph{univariate} polynomial \(R = F(x,P) \bmod Q\). Then \(R =
+    F(x,P(x)) + A(x) Q(x)\) for some \(A \in\pring\). Since \(Q\) has roots
+    \(a_1,\ldots,a_n\), we get, for \(1 \le i \le n\), \(R(a_i) = F(a_i,P(a_i))
+    + A(a_i) Q(a_i) = F(a_i,b_i)\). Therefore an algorithm \(\mathcal{B}\) to
+    solve \textsf{BivMPEval} is
+    \begin{itemize}
+      \item compute \(P\) and \(Q\) from the points (subproduct tree \& Lagrange interpolation);
+      \item use algorithm \(\mathcal{A}\) to solve \textsf{BivModComp} on input
+        \(P,Q,F\), which provides the polynomial \(R\) above;
+      \item compute \(R(a_1),\ldots,R(a_n)\) (univariate multipoint evaluation).
+    \end{itemize}
+    The complexity of the first and third steps is
+    \(\bigO{\timepm{n}\log(n)}\), hence the sought overall bound
+    \(\mathsf{C}(n,d_x,d_y) + \bigO{\timepm{n}\log(n)}\).
+
+  \item Writing \(F = \sum_{j < d_y} F_j(x) y^j\), we obtain
+    \[
+      F(x,P(x)) \bmod Q(x) = \left(\sum_{j<d_y} F_j(x) \left(P(x)^j \bmod Q(x)\right)\right)  \bmod Q(x).
+    \]
+    This formula leads straightforwardly to solving \textsf{BivModComp} in
+    \(\bigO{d_y \timepm{d_x} + d_y\timepm{n}}\) operations in \(\field\).  The
+    above complexity is quasi-linear in the size of the input when \(n \in
+    \bigO{d_x}\). 
+
+  \item In this case, Paterson and Stockmeyer's (or Brent and Kung's) baby step
+    giant step algorithm uses \(\bigO{n^{\frac{\omega+1}{2}} + n^{\frac12}
+    \timepm{n}}\) operations in \(\field\).
+
+  \item Rewriting indices, we have
+    \begin{align*}
+      F = \sum_{i,j<\delta} F_{i+\delta j}(x) y^{i+\delta j} 
+      = \sum_{j<\delta} \left( \sum_{i<\delta} F_{i+\delta j}(x) y^i \right) y^{\delta j}
+      = \sum_{j<\delta} \hat{F}_j(x,y) y^{\delta j}
+    \end{align*}
+    where \(\hat{F}_j(x,y) = \sum_{i<\delta} F_{i+\delta j}(x) y^i\), for \(j <
+    \delta\).  We can solve \textsf{BivModComp} by solving several instances of
+    it (each with smaller \(y\)-degree) with the polynomials \(\hat{F}_j(x,y)\):
+    \begin{itemize}
+      \item for \(j<\delta\), compute \(R_j = \hat{F}_j(x,P(x)) \bmod Q(x)\) \hfill [\(\delta\) instances of \textsf{BivModComp}]
+      \item for \(j<\delta\), compute \(P_j = P^{\delta j} \bmod Q\)  \hfill [total cost: \(\bigO{\delta \timepm{n}}\)]
+      \item compute and return \(\sum_{j<\delta} (R_j P_j \bmod Q)\)  \hfill [cost \(\bigO{\delta \timepm{n}}\)]
+    \end{itemize}
+    The complexity gain is obtained by realizing the computations of the
+    \(R_j\)'s simultaneously, using polynomial matrix multiplication:
+    \[
+      \begin{bmatrix}
+        R_0 \\ R_1 \\ \vdots \\ R_{\delta-1}
+      \end{bmatrix}
+      =
+      \begin{bmatrix}
+        F_0 & F_1 & \cdots & F_{\delta-1} \\
+        F_\delta & F_{1+\delta} & \cdots & F_{2\delta-1} \\
+        \vdots & \vdots & \cdots & \vdots \\
+        F_{(\delta-1)\delta} & F_{(\delta-1)\delta+1} & \cdots & F_{\delta^2-1} \\
+      \end{bmatrix}
+      \begin{bmatrix}
+        1 \\ P \\ P^2 \bmod Q \\ \cdots \\ P^{\delta-1} \bmod Q
+      \end{bmatrix}
+      \bmod Q
+    \]
+    This can be split into several steps:
+    \begin{itemize}
+      \item compute the powers \(P^i \bmod Q\) for \(i<\delta\)  \hfill [total \(\bigO{\delta\timepm{n}}\)]
+      \item compute the matrix-vector product, efficiently by expanding the
+        vector into a \(\delta \times \delta\) matrix of degree less than
+        \(n/\delta\) \hfill [total \(\bigO{\delta^\omega
+        \timepm{\frac{n}{\delta} + d_x}}\)]
+      \item the previous step has yielded \(\delta\) polynomials of degree less
+        than \(n + d_x \in \bigO{n}\) \\
+        \(\rightarrow\) reduce them mod \(Q\) \hfill [total \(\bigO{\delta\timepm{n}}\)].
+    \end{itemize}
+
+  \item Complexity bounds are given in the answer just above.
+
+  \item Yes, since \(\bigO{\delta^{\omega-1} \timepm{n}} =
+    \bigO{d_y^{\frac{\omega-1}{2}} \timepm{n}}\), and \(\frac{\omega-1}{2} <
+    0.7\) with the best known value of \(\omega < 2.4\).
+\end{enumerate}
+
+\fi
+
+\end{document}
