@@ -1,9 +1,8 @@
 # Projet-LU2IN013-2023 : Composition modulaire des polynômes à une variable
 
-SUR LES FICHIERS :
-- les fichiers "structure" contiennent ce qui est de la manipulation de la structure C Polynome (création, initialisation, affichage, destruction...)
-- les fichiers "polynome" contiennent les opérations +, - et multiplication (naïve et Karatsuba) non modulaires
-
+REPERTOIRES :
+- Les repertoires C-C++ et SageMath contiennent les différentes implémentations des opérations sur les polynomes.
+- Le repertoire LaTeX contient tout les éléments necessaires pour produire le rapport et les slides de présentation
 _____________________________________________________________________________________________
 
 COMPTE RENDU :
@@ -11,3 +10,5 @@ COMPTE RENDU :
 $\cdot$ découverte de SageMath et LaTeX
 $\cdot$ choix de la structure C pour représenter les polynômes et implémentation d'algo d'addition et de multiplication naïfs
 $\cdot$ premières approches de la composition modulaire
+
+(à compléter)
