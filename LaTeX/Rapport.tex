@@ -12,6 +12,9 @@
 \usepackage{color}
 \usepackage{graphicx}
 \usepackage{enumitem}
+\usepackage[export]{adjustbox}
+\usepackage{multicol}
+
 
 \fancyhead[L, C, R]{}
 \fancyfoot[L, R]{}
@@ -90,6 +93,9 @@ Notre étude porte principalement sur les opérations des polynomes dans l'annea
  \item Division euclidienne
 
 \end{itemize}
+
+- O tilde
+- omega
 
 \section{Multiplication}
 
@@ -176,49 +182,146 @@ def karatsuba(f, g) :
 \end{lstlisting}
 
 
-\subsection{Comparaison performances}
+\subsection{Comparaisons}
 
-\cite{aecf} Ces algorithmes sont complémentaires et non en compétition. En effet, pour des polynomes de degré inférieurs à 20 (?????) , on préfèrera l'algorithme naïfs.
-
-Performances : insérer tableau de comparaison  (seuil = ??????)
+\includegraphics[scale=0.5, center]{multi.png}
 
 \section{ALGORITHMES DE COMPOSITION MODULAIRE}
 
- Dans cette autre section du rapport, on s'intéresse à l'étude et la comparaison de trois algorithmes de composition modulaire qui calculent g(a) mod f avec $f$,g $\in \mathbb{Z}/p\mathbb{Z}[\mathrm{X}]$ de degré $n$ et a de degré $n$
- 
+Dans cette autre section du rapport, on s'intéresse à l'étude et la comparaison de trois algorithmes de composition modulaire qui calculent g(a) mod f avec 
+$f,g \in \mathbb{Z}/p\mathbb{Z}[\mathrm{X}]$ de degré $n$ et a de degré $< n$.
+
+
+
 \subsection{Algorithme naïf}
+
+\[
+g(a)\text{ mod }f = \left(\sum_{k=0}^n g_k \cdot a^k\right) \text{ mod }f    
+\]
 
 \begin{lstlisting}[title={naive}]
 def eval_naive(g, a, f) :
 	ring = g.parent()
 
 	res = ring(g[0])
-	ai = a % f
-	for i in range(1, g.degree()+1) :
+	ai = a
+	
+    for i in range(1, g.degree()+1) :
 		res = res + g[i]*ai
-		ai = (a*ai) % f
+		ai = (a*ai)
+
 	return res % f
 \end{lstlisting}
+
+\subsubsection*{Complexité}
+\begin{itemize}
+    \item Pour $i \in \{0,...,n\}$, le degré des $a_i$ est au plus égal à $k(n-1)$ donc, le produit $a_i=a_{i-1}\cdot a$ est en $\tilde{O}(kn)$
+    \item On effectue $n$ tours de boucles donc $n$ multiplications
+\end{itemize}
+Ainsi, la complexité de l'algotihme naïf est :
+\[
+n\cdot \sum_{k=1}^{n}k=n \cdot \dfrac{n(n+1)}{2} \Longrightarrow \tilde{O}(n^3)
+\]
 
 \subsection{Algorithme d'Horner}
 
 \[
-f(x)=f_0+f_1x+...+f_{n-1}x^{n-1}= (...((f_{n-1}x+f_{n-2})x+f_{n-3})...)x+f_0    
+g(a)\text{ mod }f = ((...((((g_{n-1}*a)\text{ mod }f\ +\ g_{n-2})*a)\text{ mod }f\ +\ g_{n-3})...)*a)\text{ mod }f\ +\ g_0
 \]
 
 \begin{lstlisting}[title={Horner}]
-def horner(g, a, f) :
-    res = g[g.degree()]
-    for i in range(g.degree()-1, -1, -1) :
-        res = (res*a)%f + g[i]
-    return res%f
-\end{lstlisting}
+    def horner(g, a, f) :
+        res = g[g.degree()]
+        for i in range(g.degree()-1, -1, -1) :
+            res = (res*a)%f + g[i]
+        return res%f
+    \end{lstlisting}
+
+\subsubsection*{Complexité}
+\begin{itemize}
+    \item Pour $i \in \{0,...,n\}$, le degré de $a_i$ mod $f$ est au plus égal à $n$ donc, le produit $a_i=a_{i-1}\cdot a$ est en $\tilde{O}(n)$
+    \item On effectue $n$ tours de boucles donc $n$ multiplications
+\end{itemize}
+Ainsi, la complexité de l'algorithme d'Horner est :
+\[
+n\cdot n \Longrightarrow \tilde{O}(n^2)
+\]
 
 \subsection{Algorithme de Brent et Kung}
 
-Étant donnés $\text{f}\in\mathbb{K}[\mathrm{X}]$ de degré n, a dans $\mathbb{K}[\mathrm{X}]_{<n}$ et \text{g} dans $\mathbb{K}[\mathrm{Y}]_{<n}$, l'algorithme de \text{Brent et Kung} calcule \text{g(a)}  mod \text{f} avec une complexité en \text{\~O}$((1+\text{n/d})d^{\omega_{2}/2})$. $\omega$ représente le plus petit nombre réel tels que deux matrices $\textit{n}\times\textit{n}$ peuvent être multipliées en $O(\textit{n}^{\omega+\epsilon})$ opérations pour tout $\epsilon>0$. 
 
-L'algorithme de \text{Brent et Kung} met en avant l'impact de la multiplication de matrices rectangulaires et à quel point la vitesse d'exécution dépend du degré de \text{f et de g}. Il peut etre vu comme une introduction à  l'algorithme de \text{Nusken-Ziegler} qui généralise cette approche à un polynome \text{g} à deux variables.
+\begin{align*}
+    g(y) &= g_0 + g_1y + ... + g_{\delta-1}y^{\delta-1} \\
+        &+ y^\delta(g_\delta + g_{\delta+1}y + ... + g_{2\delta-1}y^{\delta-1}) \\
+                                      &+ y^{2\delta}(g_{2\delta} + g_{2\delta+1}y + ... + g_{3\delta-1}y^{\delta-1}) \\
+                                      &+ ... \\
+                                      &+ y^{\delta(\delta-1)}(g_{\delta(\delta-1)} + g_{\delta(\delta-1)+1}y + ... + g_{\delta^2-1}y^{\delta-1}) 
+\end{align*}
+\[
+g(y) = 
+\begin{pmatrix}
+    1 & y^\delta & ... & (y^\delta)^{\delta-1}  \\  
+\end{pmatrix}
+\begin{pmatrix}
+    g_0 & g_1 & ... & g_{\delta-1} \\
+    g_{\delta} & g_{\delta+1} & ... & g_{2\delta-1} \\
+    \vdots & ... & \vdots \\
+    g_{\delta(\delta-1)} & g_{\delta(\delta-1)+1} & ... & g_{\delta^2-1}
+\end{pmatrix}
+\begin{pmatrix}
+    1 \\
+    y \\
+    \vdots \\
+    y^{\delta-1}
+\end{pmatrix}
+\]
+
+\[
+    \begin{pmatrix}
+        1 \\
+        a \text{ mod }f\\
+        \vdots \\
+        a^{\delta-1} \text{ mod }f
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        1 & 0 & ... & 0 \\
+        a_{1,0} & a_{1,1} & ... & a_{1,n-1} \\
+        \vdots & \vdots & ... & \vdots \\
+        a_{\delta-1,0} & a_{\delta-1,1} & ... & a_{\delta-1,n-1}
+    \end{pmatrix}
+    \begin{pmatrix}
+        1 \\
+        x \\
+        \vdots \\
+        x^{n-1}
+    \end{pmatrix}
+\]
+ 
+    \[g(a)\text{ mod }f =
+    \begin{pmatrix}
+        1 & y^\delta & ... & (y^\delta)^{\delta-1}  \\  
+    \end{pmatrix}
+    \begin{pmatrix}
+        g_0 & ... & g_{\delta-1} \\
+        g_{\delta} & ... & g_{2\delta-1} \\
+        \vdots & ... & \vdots \\
+        g_{\delta(\delta-1)} & ... & g_{\delta^2-1}
+    \end{pmatrix}
+    \begin{pmatrix}
+        1 &  ... & 0 \\
+        a_{1,0} & ... & a_{1,n-1} \\
+        \vdots &  ... & \vdots \\
+        a_{\delta-1,0} & ... & a_{\delta-1,n-1}
+    \end{pmatrix}
+    \begin{pmatrix}
+        1 \\
+        x \\
+        \vdots \\
+        x^{\delta-1}
+    \end{pmatrix}
+    \]
+
 
 \begin{lstlisting}[title={brent and kung}]
 def brentkung(g, a, f) :
@@ -254,13 +357,51 @@ def brentkung(g, a, f) :
 	return res
 \end{lstlisting}
 
-\subsection{Comparaison}
+\subsubsection*{Complexité}
+\begin{itemize}
+    \item Pour $i \in \{0,...,n\}$, le degré des $a_i$ est au plus égal à $k(n-1)$ donc, le produit $a_i=a_{i-1}\cdot a$ est en $\tilde{O}(kn)$
+    \item On effectue $n$ tours de boucles donc $n$ multiplications
+\end{itemize}
 
+\newpage
+
+\subsection{Comparaisons}
+\begin{multicols}{2}
+    \includegraphics[scale=0.4, center]{comp.png}
+    \columnbreak
+
+    \includegraphics[scale=0.4, center]{comp_2.png}
+\end{multicols}
 
 \section{ALGORITHME DE NUSKEN ET ZIEGLER}
 
-\begin{lstlisting}[title={nusken et ziegler}]
+\[
+    g(x,y) = \sum_{i,j<\delta}g_{i+\delta j}(x)y^{i+\delta j} = \sum_{j<\delta} \left( \sum_{i<\delta} g_{i+\delta j}(x)y^i \right) y^{\delta j}     
+    \]
+    \[
+    \begin{pmatrix}
+        B_0 \\
+        B_1 \\
+        \vdots \\
+        B_{\delta-1}
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        g_0(x)&g_1(x)&...&g_{\delta -1}(x) \\
+        g_{\delta}(x)&g_{1+\delta}(x)&...&g_{2\delta-1}(x) \\
+        \vdots&\vdots&...&\vdots \\
+        g_{(\delta-1)\delta}(x)&g_{(\delta-1)\delta+1}(x)&...&g_{\delta^2-1}(x)
+    \end{pmatrix}
+    \begin{pmatrix}
+        1 \\
+        a \\
+        a^2 \text{ mod }f \\
+        ... \\
+        a^{\delta-1} \text{ mod }f
+    \end{pmatrix}
+    \]
 
+\begin{lstlisting}[title={nusken et ziegler}]
 def nusken(g, a, f) :
     ring = a.parent()
     d = RR(sqrt(g.degree()+1)).ceil()
@@ -302,14 +443,17 @@ def nusken(g, a, f) :
 \newpage
 \section{BIBLIOGRAPHIE}
 
+\nocite{*}
+
 \bibliographystyle{plain}
 \bibliography{biblio}
 
-\begin{thebibliography}{10}
-    \bibitem{aecf} Alin Bostan, Frédéric Chyzak, Marc Giusti, Romain Lebreton, Grégoire Lecerf, Bruno Salvy, Eric Schost,
-    \emph{Algorithmes efficaces en calcul formel}, 2017
 
-\end{thebibliography}
+%\begin{thebibliography}{10}
+%    \bibitem{aecf} Alin Bostan, Frédéric Chyzak, Marc Giusti, Romain Lebreton, Grégoire Lecerf, Bruno Salvy, Eric Schost,
+%    \emph{Algorithmes efficaces en calcul formel}, 2017
+%
+%\end{thebibliography}
 
 
 \end{document}

@@ -9,6 +9,7 @@
 \usepackage{listings}
 \usepackage{graphicx}
 \usepackage{color}
+\usepackage[export]{adjustbox}
 
 
 \usetheme{Darmstadt}
@@ -21,7 +22,6 @@
 \subtitle{\small{Encadrant : M. Vincent NEIGER}}
 \author{Serigne Fallou FALL \and Marie BONBOIRE}
 \date{}
-
 
 \begin{document}
 
@@ -72,7 +72,8 @@
 \end{frame}
 
 \begin{frame}
-    \textbf{Algorithme de Karatsuba}
+    \textbf{Algorithme de Karatsuba} \\
+    Soit $k= \lceil n/2 \rceil$
     \begin{align*}
         (f \cdot g)(x) &= \textcolor{blue}{F^{(0)} \cdot G^{(0)}}\\
             &+\left( \textcolor{green}{(F^{(0)}+F^{(1)}) \cdot (G^{(0)} + G^{(1)})} - \textcolor{blue}{F^{(0)} \cdot G^{(0)}} - \textcolor{red}{F^{(1)} \cdot G^{(1)}} \right)x^k\\
@@ -82,13 +83,13 @@
     \begin{alertblock}{Complexité}
         L'algorithme de Karatsuba est en $O(n^{log_2(3)})$
     \end{alertblock}
-    \rule{\linewidth}{0.2mm}\\[0.5cm]
 
-    
 \end{frame}
-    \includegraphics[width=0.5\linewidth]{multi.png}
-\begin{frame}
 
+\begin{frame}
+    \begin{figure}
+    \includegraphics[scale=0.45, center]{multi.png}
+    \end{figure}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -114,7 +115,7 @@
 \begin{frame}
     \textbf{Algorithme de Brent et Kung} 
     \begin{align*}
-        g(x) &= g_0 + g_1y + ... + g_{\delta-1}y^{\delta-1} \\
+        g(y) &= g_0 + g_1y + ... + g_{\delta-1}y^{\delta-1} \\
             &+ y^\delta(g_\delta + g_{\delta+1}y + ... + g_{2\delta-1}y^{\delta-1}) \\
                                           &+ y^{2\delta}(g_{2\delta} + g_{2\delta+1}y + ... + g_{3\delta-1}y^{\delta-1}) \\
                                           &+ ... \\
@@ -160,12 +161,13 @@
             1 \\
             x \\
             \vdots \\
-            x^{\delta-1}
+            x^{n-1}
         \end{pmatrix}
     \]
 \end{frame}
 
 \begin{frame}
+    $g(a)\text{ mod }f =$ 
     \[
     \begin{pmatrix}
         1 \\
@@ -175,7 +177,7 @@
     \end{pmatrix}^t
     \begin{pmatrix}
         g_0 & ... & g_{\delta-1} \\
-        g_1 & ... & g_{2\delta-1} \\
+        g_{\delta} & ... & g_{2\delta-1} \\
         \vdots & ... & \vdots \\
         g_{\delta(\delta-1)} & ... & g_{\delta^2-1}
     \end{pmatrix}
@@ -193,42 +195,30 @@
     \end{pmatrix}
     \]
     \rule{\linewidth}{0.2mm}\\[0.5cm]
-    \[
-    \begin{pmatrix}
-        B_0 \\
-        B_1 \\
-        \vdots \\
-        B_d
-    \end{pmatrix}
-    =
-    \begin{pmatrix}
-        g_0 & ... & g_{d-1} \\
-        g_1 & ... & g_{2d-1} \\
-        \vdots & ... & \vdots \\
-        g_{d(d-1)} & ... & g_{d^2-1}
-    \end{pmatrix}
-    \begin{pmatrix}
-        1 & 0 & ... & 0 \\
-        a_{1,0} & a_{1,1} & ... & a_{1,n-1} \\
-        \vdots & \vdots & ... & \vdots \\
-        a_{d,0} & a_{d,1} & ... & a_{d,n-1}
-    \end{pmatrix} 
-    \]
-    \begin{itemize} 
-        \item Retourne horner(B, $a^{\delta}$, $f$)
+    
+    \begin{itemize}
+        \item Calcul des $\delta$ puissances de a mod $f$ : $\tilde{O}(n^2)$
+        \item Calcul des $B_i = \sum_{j=0}^{\delta-1} mg_{i,j}\cdot ma_{j,i}$ : $O((\sqrt{n})^{\omega+1}) = O(n^{(\omega+1)/2})$
+        \item Retourne $horner(B_i, a^{\delta}, f)$ : $\tilde{O}(n^{3/2})$
     \end{itemize}
     \begin{alertblock}{Complexité}
-        L'algorithme de Brent et Kung est en $O((1+n/d)d^{\omega_2/2})$
+        L'algorithme de Brent et Kung est en $O(n^{\omega/2}(n+1))$
     \end{alertblock}
 \end{frame}
 
 \begin{frame}
-    \includegraphics[width=1\linewidth]{comp.png}
+    \begin{columns}
+        \column{0.55\textwidth}
+            \begin{figure}
+            \includegraphics[scale=0.3, center]{comp.png}
+            \end{figure}
+        \column{0.45\textwidth}
+            \begin{figure}
+            \includegraphics[scale=0.3, center]{comp_2.png}
+            \end{figure}
+    \end{columns}
 \end{frame}
 
-\begin{frame}
-    \includegraphics[width=1\linewidth]{comp_2.png}
-\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ù
 \section{Algorithme de Nüsken et Ziegler}
@@ -241,39 +231,39 @@
     \[
     g(x,y) = \sum_{i,j<\delta}g_{i+\delta j}(x)y^{i+\delta j} = \sum_{j<\delta} \left( \sum_{i<\delta} g_{i+\delta j}(x)y^i \right) y^{\delta j}     
     \]
-
-    \begin{itemize}
-        \item Calcul simultané des $R_j = g_{i+\delta j}(x)a^i \%f $
-            \[
-            \begin{pmatrix}
-                R_0 \\
-                R_1 \\
-                \vdots \\
-                R_{\delta-1}
-            \end{pmatrix}
-            =
-            \begin{pmatrix}
-                g_0(x)&g_1(x)&...&g_{\delta -1}(x) \\
-                g_{\delta}(x)&g_{1+\delta}(x)&...&g_{2\delta-1}(x) \\
-                \vdots&\vdots&...&\vdots \\
-                g_{(\delta-1)\delta}(x)&g_{(\delta-1)\delta+1}(x)&...&g_{\delta^2-1}(x)
-            \end{pmatrix}
-            \begin{pmatrix}
-                1 \\
-                a \\
-                a^2 \%f \\
-                ... \\
-                a^{\delta-1} \%f
-            \end{pmatrix}
-            \]
-        \item Pour $j\in{0,...,\delta-1}$, $a_j=a^{\delta j}\% f$
-        \item Retourne $\sum_{j<\delta}(R_ja_j \% f)$
-    \end{itemize}
+    \[
+    \begin{pmatrix}
+        B_0 \\
+        B_1 \\
+        \vdots \\
+        B_{\delta-1}
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        g_0(x)&g_1(x)&...&g_{\delta -1}(x) \\
+        g_{\delta}(x)&g_{1+\delta}(x)&...&g_{2\delta-1}(x) \\
+        \vdots&\vdots&...&\vdots \\
+        g_{(\delta-1)\delta}(x)&g_{(\delta-1)\delta+1}(x)&...&g_{\delta^2-1}(x)
+    \end{pmatrix}
+    \begin{pmatrix}
+        1 \\
+        a \\
+        a^2 \text{ mod }f \\
+        ... \\
+        a^{\delta-1} \text{ mod }f
+    \end{pmatrix}
+    \]
+    
 
     
 \end{frame}
 
 \begin{frame}
+    \begin{itemize}
+        \item Calcul des $\delta$ puissances de a mod $f$ : $\tilde{O}(n^2)$
+        \item Calcul des $B_i = \sum_{j=0}^{\delta-1} mg_{i,j}\cdot ma_{j,i}$ : %$O((\sqrt{n})^{\omega+1}) = O(n^{(\omega+1)/2})$
+        \item Calcule et retourne $horner(B_i, a^{\delta}, f)$
+    \end{itemize}
     \begin{alertblock}{Complexité}
         L'algorithme de Nusken et Ziegler est en $O(d_yM(d_x) + d_yM(n))$
     \end{alertblock}
