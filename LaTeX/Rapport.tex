@@ -70,19 +70,44 @@
 
 
 \section{INTRODUCTION}
+
 \subsection{Sujet}
-\subsection{Objectifs}
+
+En mathématiques, les polynômes à une variable sont universellement présents dans une multitude de problème et de domaines scientifiques. Ainsi, les opérations élémentaires qu'on utilise sur les polynômes jouent un rôle crucial sur dans la conception d'algorithmes et de logiciels répondant aux exigences de ces domaines variés. Dans les domaines comme la cryptologie, ce type de calcul est très adapté donc cela nécessite de disposer d'implémentations performantes. Dans notre projet, nous allons nous intéressé particulièrement à la composition modulaire des polynômes dans un corps fini ${\mathbb{Z}/p \mathbb{Z}}$. Cette opération joue un rôle primordial pour la factorisation des polynômes à une seule variable. C'est dans ce cadre que nous allons étudier et implémenter plusieurs algorithmes à partir du plus faible au plus haute performance et complexité temporelle.
+
+
+\subsection{Objectifs du projet}
+
+L'étude de notre projet ce basant spécialement sur les calculs arithmétiques des polynômes à une variable notamment sur la composition modulaire, nos objectifs principales sont:
+\begin{itemize}
+	\item comprendre ce qu'est la composition modulaire dans le corps ${\mathbb{Z}/p \mathbb{Z}}$
+	\item trouver les algorithmes nous permettant de faire les calculs 
+	\item connaitre les complexités et l'efficacité de ces algorithmes
+	\item savoir comment les implémentés en langage informatique 
+	\item en déduire l'utilité d'utiliser ces algorithmes et les perspectives qu'ils peuvent apporter en pratique
+
+\end{itemize}
+
 \subsection{Choix d'implantation}
+
+Dans le cadre de ce projet, on s'est principalement intéressé à la composition modulaire des polynômes à une variable qui sont définis dans des corps finis. Ainsi, nous avons implémenté des algorithmes nous permettant de faire le calcul modulaire en allant du naïf au plus performant en complexité. Pour celà, on a implémenté le code sur trois langages informatiques : du \textbf{python sagemath} ( qui l'outil la plus performante et simple ) et les langages \textbf{C/C++}. Ainsi, chacune des langages présente ses particularités et nous permettra d'avoir une diversité sur la manière d'implémenter le code.
+
+Pour les opérations arithmétiques sur les polynômes comme la multiplication, l'algorithme naïf et celle de karatsuba ont été implémentés sur les trois langages de même pour la division euclidienne. Pour la composition modulaire, l'algorithme de Horner et de Brent et Kung ont étés implémentés sur sagemath et sur C++ à l'aide de la bibliothèque \textbf{NTL}. On a aussi utilisé la bibliothèque \textbf{Flint} pour la division euclidienne en langage C.
+
+Les performances des algorithmes de karatsuba, Horner et Brent et Kung sur sagemath sont beaucoup plus optimales en terme de complexité et d'efficacité. Mais également, la version de brent et kung oréinstallé sur la bibliothèque NTL en C++ est beaucoup plus rapide.Enfin, pour aller beaucoup plus loin en généralisant l'algorithme de Brent et Kung, on a utilisé un algorithme de Nusken et Ziegler qui fait appel à un polynôme à deux variables.  
 
 
 \section{NOTIONS ET NOTATIONS}
 
+\subsection{Arithmétique modulaire sur les polynômes}
 
-\subsection{Arithmétique modulaire}
+L'arithmétique s'agit essentiellement de l'étude des nombres et des opérations élémentaires comme l'addition, la multiplication, la soustraction et la division. Ainsi, plusieurs outils sont utilisés comme la division euclidienne, le calcul du PGCD, l'inversion modulaire avec l'algorithme d'Euclide, le théorème de Bézout et également la factorisation des polynomes. C'est à partir de l'arithmétique qu'on a recueilli plusieurs notions dans notre étude qu'on va détailler.
 
 \begin{itemize}[label=$\star$]
- \item Corps d'étude : ${\mathbb{Z}/p \mathbb{Z}}$
-Notre étude porte principalement sur les opérations des polynomes dans l'anneau $Z/pZ$ , où p est un nombre premier, on travaille avec des polynômes à coefficients modulo p. Cela présente plusieurs avantages comme :
+ \item \textbf{Corps d'étude} : ${\mathbb{Z}/p \mathbb{Z}}$
+\newline
+ 
+Notre étude porte principalement sur les opérations des polynomes dans l'anneau ${\mathbb{Z}/p \mathbb{Z}}$ , où p est un nombre premier, on travaille avec des polynômes à coefficients modulo p. Cela présente plusieurs avantages comme :
 	\begin{itemize}
 
   		\item réduction des calculs à des opérations arithmétiques plus simples sur des entiers avec le modulo p.
@@ -90,12 +115,25 @@ Notre étude porte principalement sur les opérations des polynomes dans l'annea
   
 	\end{itemize}
 	
- \item Division euclidienne
-
+ \item \textbf{L'algorithme d'Euclide, calcul de PGCD et division euclidienne} :
+ 
+ \bigskip
+ 
+Nous étudions principalement sur le corps ${\mathbb{Z}/p \mathbb{Z}}$ donc sur des corps finis, ces deux notions arithmétiques (\textbf{Euclide et PGCD}) sont très importants car permettent le calcul du modulo ,l'inversion modulaire et la résolution de systèmes d'équations linéaires. Ces calculs jouent un role important notamment dans la cryptologie et les codes correcteurs d'erreurs.
+\[
+\text{ Si A et B sont deux polynômes, il existe un polynôme Q et un polynôme R tels que }\]  \[ \textbf{A(x)/B(x) = Q(x)+R(x)/B(x) \text{ avec } deg(R(x)) < deg(B(x))}
+\]
+\textbf{La division euclidienne} est utilisée dans divers domaines mathématique et informatique tels que le calcul du PGCD, la recherche de nombres premiers et et de calcul modulo. Ainsi, son utilité principal dans ${\mathbb{Z}/p \mathbb{Z}}$ est la simplification des expressions et la détermination de propriétés spécifiques des polynômes. Elle est utile pour simplifier les expressions, factoriser les polynômes, trouver des racines, résoudre des équations polynomiales, établir des critères de divisibilité et également effectuer des opérations sur les polynômes et analyser leurs propriétés.
 \end{itemize}
 
-- O tilde
-- omega
+ \subsection{Quelques notations}
+ \begin{itemize}
+ \item \textbf{$\tilde{O}$} : elle est utilisée pour représenter la notion de landau et représente une forme arrondie des résultats de complexité afin d'obtenir des formules plus explicites.
+ \item \textbf{$\omega$} : elle représente le plus petit nombre réel tels que deux matrices $\textit{n}\times\textit{n}$ peuvent être multipliées en $O(\textit{n}^{\omega+\epsilon})$ opérations pour tout $\epsilon>0$ et a pour valeur approchée $\omega\approx2.38$
+
+ 
+ \end{itemize}
+
 
 \section{Multiplication}
 
