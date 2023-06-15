@@ -112,10 +112,11 @@ f=f_0+f_1\mathrm{X}+...+f_{n-1}\mathrm{X}^{n-1}\text{ et g}=\mathrm{g}_0+\mathrm
 
 Ce premier algorithme consiste à simplement développer le produit des coefficients :
 \[
-f\text{g}=\sum_{i=0}^{2n-2} (\sum_{j+k=i}f_j\mathrm{g}_k) \mathrm{X}^i
+f\cdot g=\sum_{i=0}^{2n-2} (\sum_{j+k=i}f_j\cdot g_k) x^i
 \]
-Cet algorithme est donc en $O(n^2)$. Pour multiplier deux polynômes de degrés \textit{m} et \textit{n}, l'algorithme naïf demande au plus (\textit{m}+1)\textsf{x}(\textit{n}+1) multiplications dans $\mathbb{A}$ et
-\textit{mn} additions dans $\mathbb{A}$
+
+\subsubsection*{Complexité}
+L'algorithme naïf est en $O(n^2)$
 
 \begin{lstlisting}[title={multiplication naive}]
     def mult_naive(f, g) :
@@ -136,23 +137,19 @@ Cet algorithme est donc en $O(n^2)$. Pour multiplier deux polynômes de degrés 
 
 L'amélioration proposée par Karatsuba repose sur le fait de scinder les polynomes selon :
 \[
-f=f^{(0)}+f^{(1)}\mathrm{X}^k\text{ et }\mathrm{g} = \mathrm{g}^{(0)}+\mathrm{g}^{(1)}\mathrm{X}^k
+f=f^{(0)}+f^{(1)}x^k\text{ et }g = g^{(0)}+g^{(1)}x^k
 \]
-avec $f^{(0)}, f^{(1)}, \mathrm{g}^{(0)}, \mathrm{g}^{(1)}$ de degrés au plus k-1, k=$\lceil n/2 \rceil$. Le produit s'écrit alors :
+avec $f^{(0)}, f^{(1)}, g^{(0)}, g^{(1)}$ de degré au plus $k-1$, $k=\lceil n/2 \rceil$. \\
+Le produit s'écrit alors :
 \[
-fg = f^{(0)}g^{(0)}+(f^{(0)}g^{(1)}+f^{(1)}g^{(0)})\mathrm{X}^k+f^{(1)}g^{(1)}\mathrm{X}^{2k} 
-\]
-Les opérations associées à l'algorithme permettent de gagner une multiplication par rapport à l'algorithme naïf. Par le biais des appels récursifs, ce gain se retrouve dans la puissance de l'exposant.
-Ainsi, l'algorithme de Karatsuba est en $O(n^{log_2(3)}) = O(n^{1,59})$
-
-\[
-  fg = f^{(0)}g^{(0)}
-  +\left((f^{(0)}+f^{(1)}) (g^{(0)} + g^{(1)}) - f^{(0)}g^{(0)} - f^{(1)}g^{(1)}\right)\mathrm{X}^k+
-  f^{(1)}g^{(1)}\mathrm{X}^{2k} 
+  f\cdot g = (f^{(0)}\cdot g^{(0)})
+  +\left((f^{(0)}+f^{(1)})\cdot (g^{(0)} + g^{(1)}) - f^{(0)}\cdot g^{(0)} - f^{(1)}\cdot g^{(1)}\right)x^k+
+  (f^{(1)}\cdot g^{(1)})x^{2k} 
 \]
 
+Cette décomposition permet de gagner une multiplication par rapport à l'algorithme naïf. Notons que si $k=n$ on retombe sur l'algorithme naïf.
 
-\begin{lstlisting}[title={karatsuba}]
+\begin{lstlisting}[title={Karatsuba}]
 def karatsuba(f, g) :
     ring = f.parent()
 
@@ -181,6 +178,12 @@ def karatsuba(f, g) :
     return h
 \end{lstlisting}
 
+\subsubsection*{Complexité}
+\begin{itemize}
+    \item On calcule récursivement 3 multiplications de polynomes de degré au plus $k-1$
+    \item 
+\end{itemize}
+Ainsi, l'algorithme de Karatsuba est en $O(n^{log_2(3)}) = O(n^{1,59})$
 
 \subsection{Comparaisons}
 
@@ -195,6 +198,7 @@ $f,g \in \mathbb{Z}/p\mathbb{Z}[\mathrm{X}]$ de degré $n$ et a de degré $< n$.
 
 \subsection{Algorithme naïf}
 
+L'algorithme naïf de composition modulaire consiste à directement évaluer g en a et à retourner le résultat en le réduisant par f :
 \[
 g(a)\text{ mod }f = \left(\sum_{k=0}^n g_k \cdot a^k\right) \text{ mod }f    
 \]
@@ -220,13 +224,13 @@ def eval_naive(g, a, f) :
 \end{itemize}
 Ainsi, la complexité de l'algotihme naïf est :
 \[
-n\cdot \sum_{k=1}^{n}k=n \cdot \dfrac{n(n+1)}{2} \Longrightarrow \tilde{O}(n^3)
+\sum_{k=1}^{n}kn=n \cdot \dfrac{n(n+1)}{2} \Longrightarrow \tilde{O}(n^3)
 \]
 
 \subsection{Algorithme d'Horner}
 
 \[
-g(a)\text{ mod }f = ((...((((g_{n-1}*a)\text{ mod }f\ +\ g_{n-2})*a)\text{ mod }f\ +\ g_{n-3})...)*a)\text{ mod }f\ +\ g_0
+g(a)\text{ mod }f = ((...((((g_{n-1}\cdot a)\text{ mod }f\ +\ g_{n-2})\cdot a)\text{ mod }f\ +\ g_{n-3})...)\cdot a)\text{ mod }f\ +\ g_0
 \]
 
 \begin{lstlisting}[title={Horner}]
@@ -244,12 +248,15 @@ g(a)\text{ mod }f = ((...((((g_{n-1}*a)\text{ mod }f\ +\ g_{n-2})*a)\text{ mod }
 \end{itemize}
 Ainsi, la complexité de l'algorithme d'Horner est :
 \[
-n\cdot n \Longrightarrow \tilde{O}(n^2)
+\sum_{i=1}^n n=n\cdot \sum_{i=1}^n 1 = n\cdot n\Longrightarrow \tilde{O}(n^2)
 \]
 
 \subsection{Algorithme de Brent et Kung}
 
+L'avancée de Brent et Kung a été de considérer le produit bien connu de deux matrices à coefficients constants $\omega$.
 
+
+En choissant $\delta = \sqrt(n)$, il est possible de réécrire $g$ sous la forme de :
 \begin{align*}
     g(y) &= g_0 + g_1y + ... + g_{\delta-1}y^{\delta-1} \\
         &+ y^\delta(g_\delta + g_{\delta+1}y + ... + g_{2\delta-1}y^{\delta-1}) \\
@@ -257,6 +264,8 @@ n\cdot n \Longrightarrow \tilde{O}(n^2)
                                       &+ ... \\
                                       &+ y^{\delta(\delta-1)}(g_{\delta(\delta-1)} + g_{\delta(\delta-1)+1}y + ... + g_{\delta^2-1}y^{\delta-1}) 
 \end{align*}
+
+Il est alors possible de transformer cette expression en produit de matrices dont une est à coefficients constants:
 \[
 g(y) = 
 \begin{pmatrix}
@@ -276,6 +285,7 @@ g(y) =
 \end{pmatrix}
 \]
 
+De même, on transforme le vecteur des $\delta$ puissances de $a$ mod $f$, en un produit d'une matrice à coefficients constants par un vecteur de l'inconnue, soit $x$ :
 \[
     \begin{pmatrix}
         1 \\
@@ -297,30 +307,32 @@ g(y) =
         x^{n-1}
     \end{pmatrix}
 \]
- 
-    \[g(a)\text{ mod }f =
-    \begin{pmatrix}
-        1 & y^\delta & ... & (y^\delta)^{\delta-1}  \\  
-    \end{pmatrix}
-    \begin{pmatrix}
-        g_0 & ... & g_{\delta-1} \\
-        g_{\delta} & ... & g_{2\delta-1} \\
-        \vdots & ... & \vdots \\
-        g_{\delta(\delta-1)} & ... & g_{\delta^2-1}
-    \end{pmatrix}
-    \begin{pmatrix}
-        1 &  ... & 0 \\
-        a_{1,0} & ... & a_{1,n-1} \\
-        \vdots &  ... & \vdots \\
-        a_{\delta-1,0} & ... & a_{\delta-1,n-1}
-    \end{pmatrix}
-    \begin{pmatrix}
-        1 \\
-        x \\
-        \vdots \\
-        x^{\delta-1}
-    \end{pmatrix}
-    \]
+
+On obtient ainsi la formule suivante :
+\[
+g(a)\text{ mod }f =
+\begin{pmatrix}
+    1 & y^\delta & ... & (y^\delta)^{\delta-1}  \\  
+\end{pmatrix}
+\begin{pmatrix}
+    g_0 & ... & g_{\delta-1} \\
+    g_{\delta} & ... & g_{2\delta-1} \\
+    \vdots & ... & \vdots \\
+    g_{\delta(\delta-1)} & ... & g_{\delta^2-1}
+\end{pmatrix}
+\begin{pmatrix}
+    1 &  ... & 0 \\
+    a_{1,0} & ... & a_{1,n-1} \\
+    \vdots &  ... & \vdots \\
+    a_{\delta-1,0} & ... & a_{\delta-1,n-1}
+\end{pmatrix}
+\begin{pmatrix}
+    1 \\
+    x \\
+    \vdots \\
+    x^{\delta-1}
+\end{pmatrix}
+\]
 
 
 \begin{lstlisting}[title={brent and kung}]
@@ -375,31 +387,37 @@ def brentkung(g, a, f) :
 
 \section{ALGORITHME DE NUSKEN ET ZIEGLER}
 
+L'algorithme de Nüsken et Ziegler est une généralisation de celui de Brent et Kung aux polynômes à deux variables. 
+Son principe est donc similaire, en différant au niveau de la matrice des coefficients de $g$ qui ici, contient des polynomes en $x$.
+On y retrouve toutefois les mêmes étapes de calcul.
+
 \[
-    g(x,y) = \sum_{i,j<\delta}g_{i+\delta j}(x)y^{i+\delta j} = \sum_{j<\delta} \left( \sum_{i<\delta} g_{i+\delta j}(x)y^i \right) y^{\delta j}     
-    \]
-    \[
-    \begin{pmatrix}
-        B_0 \\
-        B_1 \\
-        \vdots \\
-        B_{\delta-1}
-    \end{pmatrix}
-    =
-    \begin{pmatrix}
-        g_0(x)&g_1(x)&...&g_{\delta -1}(x) \\
-        g_{\delta}(x)&g_{1+\delta}(x)&...&g_{2\delta-1}(x) \\
-        \vdots&\vdots&...&\vdots \\
-        g_{(\delta-1)\delta}(x)&g_{(\delta-1)\delta+1}(x)&...&g_{\delta^2-1}(x)
-    \end{pmatrix}
-    \begin{pmatrix}
-        1 \\
-        a \\
-        a^2 \text{ mod }f \\
-        ... \\
-        a^{\delta-1} \text{ mod }f
-    \end{pmatrix}
-    \]
+g(x,y) = \sum_{i,j<\delta}g_{i+\delta j}(x)y^{i+\delta j} = \sum_{j<\delta} \left( \sum_{i<\delta} g_{i+\delta j}(x)y^i \right) y^{\delta j}     
+\]
+\[
+g(x, a)\text{ mod }f =
+\begin{pmatrix}
+    1 & y^\delta & ... & (y^\delta)^{\delta-1}  \\  
+\end{pmatrix}
+\begin{pmatrix}
+    g_0(x) & ... & g_{\delta-1}(x) \\
+    g_{\delta}(x) & ... & g_{2\delta-1}(x) \\
+    \vdots & ... & \vdots \\
+    g_{\delta(\delta-1)}(x) & ... & g_{\delta^2-1}(x)
+\end{pmatrix}
+\begin{pmatrix}
+    1 &  ... & 0 \\
+    a_{1,0} & ... & a_{1,n-1} \\
+    \vdots &  ... & \vdots \\
+    a_{\delta-1,0} & ... & a_{\delta-1,n-1}
+\end{pmatrix}
+\begin{pmatrix}
+    1 \\
+    x \\
+    \vdots \\
+    x^{\delta-1}
+\end{pmatrix}
+\]
 
 \begin{lstlisting}[title={nusken et ziegler}]
 def nusken(g, a, f) :
