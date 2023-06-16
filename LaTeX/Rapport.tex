@@ -78,7 +78,7 @@
 
 \subsection{Sujet}
 
-En mathématiques, les polynômes à une variable sont universellement présents dans une multitude de problème et de domaines scientifiques. Ainsi, les opérations élémentaires qu'on utilise sur les polynômes jouent un rôle crucial sur dans la conception d'algorithmes et de logiciels répondant aux exigences de ces domaines variés. Dans les domaines comme la cryptologie, ce type de calcul est très adapté donc cela nécessite de disposer d'implémentations performantes. Dans notre projet, nous allons nous intéressé particulièrement à la composition modulaire des polynômes dans un corps fini \textbf{${\mathbb{Z}/p \mathbb{Z}}$}. Cette opération joue un rôle primordial pour la factorisation des polynômes à une seule variable. C'est dans ce cadre que nous allons étudier et implémenter plusieurs algorithmes à partir du plus faible au plus haute performance et complexité temporelle.
+En mathématiques, les polynômes à une variable sont universellement présents dans une multitude de problème et de domaines scientifiques. Ainsi, les opérations élémentaires qu'on utilise sur les polynômes jouent un rôle crucial dans la conception d'algorithmes et de logiciels répondant aux exigences de ces domaines variés. Dans les domaines comme la cryptologie, ce type de calcul est très adapté donc cela nécessite de disposer d'implémentations performantes. Dans notre projet, nous allons nous intéresser particulièrement à la composition modulaire des polynômes dans un corps fini \textbf{${\mathbb{Z}/p \mathbb{Z}}$}. Cette opération nous permet de procéder à la factorisation des polynômes à une seule variable. C'est dans ce cadre que nous allons étudier et implémenter plusieurs algorithmes à partir de la plus faible à la plus haute performance et complexité temporelle.
 
 
 \subsection{Objectifs du projet}
@@ -95,32 +95,32 @@ L'étude de notre projet ce basant spécialement sur les calculs arithmétiques 
 
 \subsection{Choix d'implantation}
 
-Dans le cadre de ce projet, on s'est principalement intéressé à la composition modulaire des polynômes à une variable qui sont définis dans des corps finis. Ainsi, nous avons implémenté des algorithmes nous permettant de faire le calcul modulaire en allant du naïf au plus performant en complexité. Pour celà, on a implémenté le code sur trois langages informatiques : du \textbf{python sagemath} ( qui est l'outil la plus performante et simple ) et les langages \textbf{C/C++}. Ainsi, chacune des langages présente ses particularités et nous permettra d'avoir une diversité sur la manière d'implémenter le code.
+Dans le cadre de ce projet, on s'est principalement intéressé à la composition modulaire des polynômes à une variable qui sont définis dans des corps finis. Ainsi, nous avons implémenté des algorithmes nous permettant de faire le calcul modulaire en allant du naïf au plus performant en complexité. Pour celà, on a implémenté le code sur trois langages informatiques : du \textbf{python sagemath} ( qui est l'outil la plus performante et simple d'après nos tests ) et les langages \textbf{C/C++}. Ainsi, chacune des langages présente ses particularités et nous permettra d'avoir une diversité sur la manière d'implémenter le code.
 
 Pour les opérations arithmétiques sur les polynômes comme la multiplication, l'algorithme naïf et celle de karatsuba ont été implémentés sur les trois langages de même pour la division euclidienne. Pour la composition modulaire, l'algorithme de Horner et de Brent et Kung ont étés implémentés sur sagemath et sur \textbf{C++} à l'aide de la bibliothèque \textbf{NTL}. On a aussi utilisé la bibliothèque \textbf{Flint} pour la division euclidienne en langage \textbf{C}.
 
-Les performances des algorithmes de karatsuba, Horner et Brent et Kung sur sagemath sont beaucoup plus optimales en terme de complexité et d'efficacité. Mais également, la version de brent et kung oréinstallé sur la bibliothèque \textbf{NTL} en \textbf{C++} est beaucoup plus rapide.Enfin, pour aller beaucoup plus loin en généralisant l'algorithme de Brent et Kung, on a utilisé un algorithme de Nusken et Ziegler qui fait appel à un polynôme à deux variables.  
+Les performances des algorithmes de karatsuba, Horner et Brent et Kung sur sagemath sont beaucoup plus optimales en terme de complexité et d'efficacité. Mais également, la version de brent et kung préinstallée sur la bibliothèque \textbf{NTL} en \textbf{C++} est beaucoup plus rapide.Enfin, pour aller beaucoup plus loin en généralisant l'algorithme de Brent et Kung, on a utilisé un algorithme de Nusken et Ziegler qui fait appel à un polynôme à deux variables.  
 
 
 \section{NOTIONS ET NOTATIONS}
 
 \subsection{Arithmétique modulaire sur les polynômes}
 
-L'arithmétique s'agit essentiellement de l'étude des nombres et des opérations élémentaires comme l'addition, la multiplication, la soustraction et la division. Ainsi, plusieurs outils sont utilisés comme la division euclidienne, le calcul du PGCD, l'inversion modulaire avec l'algorithme d'Euclide, le théorème de Bézout et également la factorisation des polynomes. C'est à partir de l'arithmétique qu'on a recueilli plusieurs notions dans notre étude qu'on va détailler.
+L'arithmétique s'agit essentiellement de l'étude des nombres et des opérations élémentaires comme l'addition, la multiplication, la soustraction et la division. Ainsi, plusieurs outils sont utilisés comme la division euclidienne, le calcul du PGCD, l'inversion modulaire avec l'algorithme d'Euclide, le théorème de Bézout et également la factorisation des polynômes. C'est à partir de l'arithmétique qu'on a recueilli plusieurs notions dans notre étude qu'on va détailler.
 
  \subsubsection{Corps d'étude : ${\mathbb{Z}/p \mathbb{Z}}$}
  
 Notre étude porte principalement sur les opérations des polynômes dans l'anneau ${\mathbb{Z}/p \mathbb{Z}}$ , où p est un nombre premier, on travaille avec des polynômes à coefficients modulo p. Cela présente plusieurs avantages comme :
 	\begin{itemize}
 
-  		\item réduction des calculs à des opérations arithmétiques plus simples sur des entiers avec le modulo p.
-  		\item simplification et limitations de la taille des coefficients pour obtenir des résultats plus facilement et permet d'exploiter des propriétés spécifiques de l'arithmétique modulaire.
+  		\item la réduction des calculs à des opérations arithmétiques plus simples sur des entiers avec le modulo p.
+  		\item la simplification et limitations de la taille des coefficients pour obtenir des résultats plus facilement et permet d'exploiter des propriétés spécifiques de l'arithmétique modulaire.
   
 	\end{itemize}
 	
  \subsubsection{Algorithme d'Euclide, Calcul de PGCD et Division euclidienne}
  
-Nous étudions principalement sur le corps ${\mathbb{Z}/p \mathbb{Z}}$ donc sur des corps finis, ces deux notions arithmétiques (Euclide et PGCD) sont très importants car permettent le calcul du modulo ,l'inversion modulaire et la résolution de systèmes d'équations linéaires. Ces calculs jouent un role important notamment dans la cryptologie et les codes correcteurs d'erreurs.
+Nous étudions principalement sur le corps ${\mathbb{Z}/p \mathbb{Z}}$ donc sur des corps finis, ces deux notions arithmétiques (Euclide et PGCD) sont très importants car permettent le calcul du modulo ,l'inversion modulaire et la résolution de systèmes d'équations linéaires. Ces calculs jouent un rôle important notamment dans la cryptologie et les codes correcteurs d'erreurs.
 \[
 \text{ Si A et B sont deux polynômes, il existe un polynôme Q et un polynôme R tels que }\] 
  \[ \dfrac{A(x)}{B(x)} = Q(x)+\dfrac{R(x)}{B(x)} \text{ avec } deg(R(x)) < deg(B(x))
@@ -514,5 +514,4 @@ def nusken(g, a, f) :
 
 
 \end{document}
-
 
