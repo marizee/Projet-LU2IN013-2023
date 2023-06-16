@@ -20,7 +20,7 @@
 \fancyhead[L, C, R]{}
 \fancyfoot[L, R]{}
 \fancyfoot[C]{\vspace{1mm}\thepage}
-\lfoot{\vspace{1mm}Projet-IN013}
+\lfoot{\vspace{1mm}Projet-LU2IN013}
 \rfoot{\vspace{1mm}Sorbonne-université}
 \rhead{\vspace{1mm}\today}
 \lhead{\vspace{1mm}2022-2023}
@@ -108,9 +108,7 @@ Les performances des algorithmes de karatsuba, Horner et Brent et Kung sur sagem
 
 L'arithmétique s'agit essentiellement de l'étude des nombres et des opérations élémentaires comme l'addition, la multiplication, la soustraction et la division. Ainsi, plusieurs outils sont utilisés comme la division euclidienne, le calcul du PGCD, l'inversion modulaire avec l'algorithme d'Euclide, le théorème de Bézout et également la factorisation des polynomes. C'est à partir de l'arithmétique qu'on a recueilli plusieurs notions dans notre étude qu'on va détailler.
 
-\begin{itemize}[label=$\star$]
- \item \textbf{Corps d'étude} : ${\mathbb{Z}/p \mathbb{Z}}$
-\newline
+ \subsubsection{Corps d'étude : ${\mathbb{Z}/p \mathbb{Z}}$}
  
 Notre étude porte principalement sur les opérations des polynomes dans l'anneau ${\mathbb{Z}/p \mathbb{Z}}$ , où p est un nombre premier, on travaille avec des polynômes à coefficients modulo p. Cela présente plusieurs avantages comme :
 	\begin{itemize}
@@ -120,21 +118,19 @@ Notre étude porte principalement sur les opérations des polynomes dans l'annea
   
 	\end{itemize}
 	
- \item \textbf{L'algorithme d'Euclide, calcul de PGCD et division euclidienne} :
+ \subsubsection{Algorithme d'Euclide, calcul de PGCD et division euclidienne}
  
- \bigskip
- 
-Nous étudions principalement sur le corps ${\mathbb{Z}/p \mathbb{Z}}$ donc sur des corps finis, ces deux notions arithmétiques (\textbf{Euclide et PGCD}) sont très importants car permettent le calcul du modulo ,l'inversion modulaire et la résolution de systèmes d'équations linéaires. Ces calculs jouent un role important notamment dans la cryptologie et les codes correcteurs d'erreurs.
+Nous étudions principalement sur le corps ${\mathbb{Z}/p \mathbb{Z}}$ donc sur des corps finis, ces deux notions arithmétiques (Euclide et PGCD) sont très importants car permettent le calcul du modulo ,l'inversion modulaire et la résolution de systèmes d'équations linéaires. Ces calculs jouent un role important notamment dans la cryptologie et les codes correcteurs d'erreurs.
 \[
-\text{ Si A et B sont deux polynômes, il existe un polynôme Q et un polynôme R tels que }\]  \[ \textbf{A(x)/B(x) = Q(x)+R(x)/B(x) \text{ avec } deg(R(x)) < deg(B(x))}
+\text{ Si A et B sont deux polynômes, il existe un polynôme Q et un polynôme R tels que }\] 
+ \[ \dfrac{A(x)}{B(x)} = Q(x)+\dfrac{R(x)}{B(x)} \text{ avec } deg(R(x)) < deg(B(x))
 \]
-\textbf{La division euclidienne} est utilisée dans divers domaines mathématique et informatique tels que le calcul du PGCD, la recherche de nombres premiers et et de calcul modulo. Ainsi, son utilité principal dans ${\mathbb{Z}/p \mathbb{Z}}$ est la simplification des expressions et la détermination de propriétés spécifiques des polynômes. Elle est utile pour simplifier les expressions, factoriser les polynômes, trouver des racines, résoudre des équations polynomiales, établir des critères de divisibilité et également effectuer des opérations sur les polynômes et analyser leurs propriétés.
-\end{itemize}
+La division euclidienne est utilisée dans divers domaines mathématique et informatique tels que le calcul du PGCD, la recherche de nombres premiers et et de calcul modulo. Ainsi, son utilité principal dans ${\mathbb{Z}/p \mathbb{Z}}$ est la simplification des expressions et la détermination de propriétés spécifiques des polynômes. Elle est utile pour simplifier les expressions, factoriser les polynômes, trouver des racines, résoudre des équations polynomiales, établir des critères de divisibilité et également effectuer des opérations sur les polynômes et analyser leurs propriétés.
 
  \subsection{Quelques notations}
  \begin{itemize}
- \item \textbf{$\tilde{O}$} : elle est utilisée pour représenter la notion de landau et représente une forme arrondie des résultats de complexité afin d'obtenir des formules plus explicites.
- \item \textbf{$\omega$} : elle représente le plus petit nombre réel tels que deux matrices $\textit{n}\times\textit{n}$ peuvent être multipliées en $O(\textit{n}^{\omega+\epsilon})$ opérations pour tout $\epsilon>0$ et a pour valeur approchée $\omega\approx2.38$
+ \item \textbf{$\tilde{O}$ :} elle est utilisée pour représenter la notion de landau et représente une forme arrondie des résultats de complexité afin d'obtenir des formules plus explicites.
+ \item \textbf{$\omega$ :} elle représente le plus petit nombre réel tels que deux matrices $\textit{n}\times\textit{n}$ peuvent être multipliées en $O(\textit{n}^{\omega+\epsilon})$ opérations pour tout $\epsilon>0$ et a pour valeur approchée $\omega\approx2.38$
 
  
  \end{itemize}
