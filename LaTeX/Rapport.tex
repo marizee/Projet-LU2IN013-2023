@@ -154,7 +154,7 @@ Dans ce projet, elle nous a servi à réduire le degré des polynômes manipulé
 
 \subsubsection*{Notations}
 \begin{itemize}
-    \item $\tilde{O}$ : cache les facteurs logarithmiques dans la complexité des algorithmes (\textit{i.e.} $\tilde{O}(c)$ = $O(c\cdot log^{k}(c))$ pour $k>0$)
+    \item $\tilde{O}$ : cache les facteurs logarithmiques dans la complexité des algorithmes (\textit{ie.} $\tilde{O}(c)$ = $O(c\cdot log^{k}(c))$ pour $k>0$)
     \item $\omega$ : c'est le plus petit nombre réel tels que deux matrices carrées de taille $n$ peuvent être multipliées. Pour notre étude, nous avons choisi la valeur donnée par V.Strassen soit $$\omega=2.807$$
     La multiplication de deux matrices carrées de taille $n$ se fait donc en $$O(n^\omega)=O(n^{2.807})$$
     \item Les graphes de comparaison correspondent à la mesure, en fonction du temps en secondes, des algorithmes avec $n$ le plus haut degré des polynômes donnés en paramètres.
@@ -268,7 +268,7 @@ L'algorithme de Karatsuba est en $O(n^{log_2(3)}) \approx O(n^{1,59})$
 \includegraphics[scale=0.5, center]{multi.png}
 \textit{
 \begin{itemize}
-    \item Le graphe ci-dessus nous montre l'allure cubique de la courbe de l'algorithme naif qui a une complexité moins optimale que celui de Karatsuba qui présente une allure quadratique. Cependant, la version déjà implémenté sur sagemath reste nettement le plus optimisé.
+    \item Le graphe ci-dessus nous montre l'allure cubique de la courbe de l'algorithme naif qui a une complexité moins optimale que celui de Karatsuba qui présente une allure quadratique. Cependant, la version déjà implémenté sur sagemath reste nettement la plus performante.
 \end{itemize}
 }
 
@@ -568,7 +568,7 @@ def nuskenziegler(g, a, f) :
 \subsubsection*{Complexité}
 \begin{itemize}
     \item Pour $i \in \{0,...,\delta\}$, le degré de $a_i$ mod $f$ est au plus égal à $n$ donc, le produit $a_i=a_{i-1}\cdot a$ est en $\tilde{O}(n)$ (cf. Theorem 1)
-    \item Soit $d$ le degré de la variable $x$, on a $\sqrt{n}$ de produits de matrice pour la variable $y$ et $d$ produits de matrice pour la variable $x$
+    \item Soit $d$ le degré de la variable $x$, on a $\sqrt{n}$ de produits de matrice pour la variable $y$ et $d$ produits de matrice pour la variable $x$.
     Nous avons donc $\sqrt{n} + d$ produits de matrices en $$O((\sqrt{n}+d)\cdot \sqrt{n}^{\omega})=O(n^{(\omega+1)/2} + n^{(\omega/2)}\cdot d)$$ 
     \item L'évaluation polynômiale d'Horner coûte $O(n\cdot \delta)=O(n^{3/2})$
 \end{itemize}
