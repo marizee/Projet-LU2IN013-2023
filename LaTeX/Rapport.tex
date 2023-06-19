@@ -1,7 +1,6 @@
 %! TEX program = xelatex
 \documentclass[a4paper]{article}
 \usepackage{amsmath, amssymb, mathtools}
-\usepackage{amsthm}
 \usepackage{fontspec}
 \usepackage{xunicode}
 \usepackage{fancyhdr}
@@ -16,6 +15,7 @@
 \usepackage{multicol}
 \usepackage{lastpage}
 \usepackage[dvipsnames]{xcolor} 
+\usepackage[standard]{ntheorem}
 
 \fancyhead[L, C, R]{}
 \fancyfoot[L, R]{}
@@ -80,43 +80,37 @@
 \section{INTRODUCTION}
 
 \subsection{Sujet}
-\textit{
 Les polynômes à une variable sont un objet mathématique fondamental, qui
 apparaît de manière omniprésente dans de nombreux problèmes et applications provenant
 de contextes scientifiques variés. Par conséquent, les opérations les plus courantes sur les
-polynômes sur les polynômes (addition, multiplication, division euclidienne, PGCD, inversion
-modulaire, factorisation...) forment une composante essentielle de solutions algorithmiques et
+polynômes (addition, multiplication, division euclidienne, PGCD, inversion
+modulaire, ...) forment une composante essentielle de solutions algorithmiques et
 logicielles conçues pour répondre aux besoins de ces contextes.
+
 Les sciences du numérique fournissent un champ naturel d’applications pour ce type de calculs,
 avec en particulier la cryptologie et les codes correcteurs d’erreurs où les calculs se font sur des
 nombres exacts (entiers, rationnels, corps finis, ..). Par ailleurs, ces domaines demandent souvent
-de résoudre des instances dont la taille est particulièrement importante. Il est donc essentiel de
-disposer d’implantations haute-performance pour ce type de calculs. Ces implantations doivent
-sélectionner l’algorithme le plus approprié, et exploiter au mieux les techniques disponibles sur
-les processeurs modernes.
-Dans le cadre de ce projet, on s’intéressera à l’opération de composition modulaire, qui occupe
-une place importante notamment dans la factorisation des polynômes à une variable. On
-étudiera puis implantera plusieurs algorithmes, allant du naïf, à celui qui est classiquement
-implanté, puis enfin à celui qui a la meilleur complexité connue à ce jour. On mettra en
-lumière la corrélation entre complexité estimée et performances en pratique, dans plusieurs cas
-particuliers importants pour les applications à la factorisation. Enfin, si le temps le permet, on
-exploitera des techniques de parallélisation ou de vectorisation pour améliorer les performances
-pratiques.
-Les étudiants développeront des compétences en algorithmique mathématique et en program-
-mation haute-performance en langage C/C++. Ils seront initiés à l’usage d’outils collaboratifs
-comme Git et à l’écriture scientifique avec LaTeX.
-} REECRIRE
+de résoudre des instances dont la taille est particulièrement importante.
 
-\subsubsection*{Objectifs du projet}
+Nous mettrons donc en évidence la nécessité de disposer d’implantations haute-performance pour ce type de calculs. Ces implantations doivent
+sélectionner l’algorithme le plus approprié, et exploiter au mieux les techniques disponibles sur
+les processeurs modernes. 
+
+Dans le cadre de ce projet, nous nous intéressons à l’opération de composition modulaire 
+qui occupe une place importante dans la manipulation des polynômes univariés mais dont la complexité n'a toujours pas atteint la quasi linéarité contrairement à la plupart des opérations sur les polynômes.
+
+Il a donc été question d'étudier, implanter et comparer plusieurs algorithmes, allant du naïf, à celui qui est classiquement
+implanté, puis enfin à celui qui a la meilleur complexité connue à ce jour. 
+
+
+\subsection{Objectifs du projet}
 
 L'étude de notre projet se base spécialement sur les calculs arithmétiques des polynômes à une variable et notamment sur la composition modulaire. Nos objectifs principaux sont :
 \begin{itemize}
-	\item comprendre ce qu'est la composition modulaire de polynômes dans le corps ${\mathbb{Z}/p \mathbb{Z}}$
-	\item trouver les algorithmes nous permettant de faire les calculs 
-	\item connaitre les complexités et l'efficacité de ces algorithmes
-	\item savoir comment les implémenter en langage informatique 
-	\item en déduire l'utilité d'utiliser ces algorithmes et les perspectives qu'ils peuvent apporter en pratique
-
+	\item Apprendre à manipuler les polynômes dans le corps ${\mathbb{Z}/p \mathbb{Z}}$.
+	\item Etudier et implémenter dans 3 langages différents les algorithmes existants du plus naïf au meilleur connu à ce jour.
+	\item Comprendre les complexités et l'efficacité de ces algorithmes. 
+	\item Comparer ces perfomances et leurs utilisations en pratique.
 \end{itemize}
 
 \subsection{Choix d'implantation}
@@ -137,35 +131,39 @@ Certains algorithmes nous étaient fournis dans la bibliothèque NTL. Il a donc 
 
 \subsection{Premières notions et notations}
 
-\subsubsection*{Arithmétique modulaire sur les polynômes}
+\paragraph{Arithmétique modulaire sur les polynômes} : 
 
 L'arithmétique s'agit essentiellement de l'étude des nombres et des opérations élémentaires comme l'addition, la soustraction, la multiplication, et la division. 
 Ainsi, plusieurs outils sont utilisés comme la division euclidienne, le calcul du PGCD, l'inversion modulaire avec l'algorithme d'Euclide, le théorème de Bézout. C'est à partir de l'arithmétique que nous avons recueilli plusieurs notions dans notre étude que nous allons détailler.
 
-\paragraph{Corps d'étude :} ${\mathbb{Z}/p \mathbb{Z}}[x] := \{\text{polynômes univariés à coefficients entiers dans }\{0,...,p-1\}\}$ où $p$ est un nombre premier tenant dans un mot machine (i.e. 64 bits ?). \\
-Nous avons fait ce choix pour obtenir un contexte exacte de ce qui se passe. Cela s'oppose à un contexte numérique que nous rencontrons avec les corps $\mathbb{Q}$ et $\mathbb{R}$ par exemples.	
+\paragraph{Corps d'étude} :
 
-\textit{
-\paragraph{Algorithme d'Euclide, calcul de PGCD et division euclidienne} :
+${\mathbb{Z}/p \mathbb{Z}}[x] := \{\text{polynômes univariés à coefficients entiers dans }\{0,...,p-1\}\}$ où $p$ est un nombre premier tenant dans un mot machine (i.e. 64 bits ?). \\
+Nous avons fait ce choix pour obtenir un contexte exacte. Cela s'oppose à un contexte numérique, que nous rencontrons avec les corps $\mathbb{Q}$ et $\mathbb{R}$ par exemples, qui obligent une représentation bornée par un nombre de bits finis.	
+
+\paragraph{Division euclidienne} :
+
 Si A et B sont deux polynômes, il existe un polynôme Q et un polynôme R tels que  
 \[
 A(x) = Q(x)\cdot B(x) + R(x) \text{ avec } deg(R(x)) < deg(B(x))
 \]
-La division euclidienne est utilisée dans divers domaines mathématique et informatique tels que le calcul du PGCD, la recherche de nombres premiers et et de calcul modulo. Ainsi, son utilité principal dans ${\mathbb{Z}/p \mathbb{Z}}$ est la simplification des expressions et la détermination de propriétés spécifiques des polynômes. Elle est utile pour simplifier les expressions, factoriser les polynômes, trouver des racines, résoudre des équations polynomiales, établir des critères de divisibilité et également effectuer des opérations sur les polynômes et analyser leurs propriétés.
-} 
-A REVOIR
+
+La division euclidienne est utilisée dans divers domaines mathématiques et informatiques tels que le calcul du PGCD avec l'algorithme d'Euclide, la recherche de nombres premiers et les opérations modulaires. 
+Dans ce projet, elle nous a servi à réduire le degré des polynômes manipulés afin d'optimiser le temps de calcul. Cette remarque sera dévelopée dans le chapitre de composition modulaire.
+
 
 \subsubsection*{Notations}
 \begin{itemize}
-\item $\tilde{O}$ : cache les facteurs logarithmiques dans la complexité des algorithmes (\textit{ie} $\tilde{O}(c)$ = $O(c\cdot log^{k}(c))$ pour $k>0$)
-\item $\omega$ : c'est le plus petit nombre réel tels que deux matrices carrées de taille $n$ peuvent être multipliées. Pour notre étude, nous avons choisi la valeur donnée par V.Strassen soit $\omega=2.807$
-La multiplication de deux matrices carrées de taille $n$ se fait donc en $O(n^\omega)=O(n^{2.807})$
+    \item $\tilde{O}$ : cache les facteurs logarithmiques dans la complexité des algorithmes (\textit{i.e.} $\tilde{O}(c)$ = $O(c\cdot log^{k}(c))$ pour $k>0$)
+    \item $\omega$ : c'est le plus petit nombre réel tels que deux matrices carrées de taille $n$ peuvent être multipliées. Pour notre étude, nous avons choisi la valeur donnée par V.Strassen soit $$\omega=2.807$$
+    La multiplication de deux matrices carrées de taille $n$ se fait donc en $$O(n^\omega)=O(n^{2.807})$$
+    \item Les graphes de comparaison correspondent à la mesure, en fonction du temps en secondes, des algorithmes avec $n$ le plus haut degré des polynômes donnés en paramètres.
 \end{itemize}
 
 
 \section{MULTIPLICATION}
 
-La multiplication est une opération de base qui intervient beaucoup dans la manipulation de polynômes.
+La multiplication est une opération élémentaire qui intervient beaucoup dans la manipulation de polynômes.
 
 Dans cette section, nous étudions deux algorithmes qui calculent le produit de deux polynômes univariés $f,g \in \mathbb{Z}/p\mathbb{Z}[x]$ de degré strictement inférieur à $n$ :
 \[
@@ -210,19 +208,21 @@ avec $f^{(0)}, f^{(1)}, g^{(0)}, g^{(1)}$ de degré au plus $k-1$ et $k=\lceil n
 Le produit s'écrit alors :
 \[
 (f\cdot g)(x) = \textcolor{myred}{(f^{(0)}\cdot g^{(0)})}
-+\left(\textcolor{mygreen}{(f^{(0)}+f^{(1)})\cdot (g^{(0)} + g^{(1)})} - f^{(0)}\cdot g^{(0)} - f^{(1)}\cdot g^{(1)}\right)x^k+
-\textcolor{myblue}{(f^{(1)}\cdot g^{(1)})}x^{2k} 
++\left(\textcolor{mygreen}{(f^{(0)}+f^{(1)})\cdot (g^{(0)} + g^{(1)})} - \textcolor{myred}{f^{(0)}\cdot g^{(0)}} - \textcolor{myblue}{f^{(1)}\cdot g^{(1)}}\right)x^k
++\textcolor{myblue}{(f^{(1)}\cdot g^{(1)})}x^{2k} 
 \]
 
 Notons qu'en développant le produit \textcolor{mygreen}{vert}, nous retombons sur l'algorithme naïf 
 \begin{align*}
-(f\cdot g)(x) &= (f^{(0)}\cdot g^{(0)})
-        +(f^{(0)}\cdot g^{(1)}+f^{(1)}\cdot g^{(0)})x^k+
-        (f^{(1)}\cdot g^{(1)})x^{2k} \\
+(f\cdot g)(x) &= \textcolor{myred}{(f^{(0)}\cdot g^{(0)})}
+        +\textcolor{mygreen}{(f^{(0)}\cdot g^{(1)}+f^{(1)}\cdot g^{(0)})}x^k
+        +\textcolor{myblue}{(f^{(1)}\cdot g^{(1)})}x^{2k} \\
         &= (f^{(0)}+f^{(1)}x^k) \cdot (g^{(0)}+g^{(1)})x^k
 \end{align*}
 
-Ainsi, l'algorithme de Karatsuba permet de gagner une multiplication. Par le biais des appels récursifs, ce gain va apparaître dans la complexité.
+Cela permet de mettre en valeur que, dans l'opération en vert, l'algorithme naïf possède une addition et deux multiplications tandis que la formule proposée par Karatsuba 
+possède deux additions et une multiplication.  
+L'addition étant négligeable par rapport à la multiplication, ce gain va apparaître, par le biais des appels récursifs, dans la complexité de l'algorithme de Karatsuba.
 
 \begin{lstlisting}[title={Karatsuba}]
 def karatsuba(f, g) :
@@ -275,27 +275,26 @@ L'algorithme de Karatsuba est en $O(n^{log_2(3)}) \approx O(n^{1,59})$
 Le produit effectué par SageMath utilise un algorithme à base de FFT.
 
 
-\theoremstyle{definition}
-\newtheorem*{thm}{Theoreme}
-\begin{thm}
+\begin{Theorem}
 La multiplication de polynômes de degré au plus $n$ dans $\mathbb{Z}/p\mathbb{Z}$ requiert $O(nlognloglogn)$ opérations via la transformée de Fourier rapide (FFT).
 \cite{aecf-2017-livre}
-\end{thm}
+\end{Theorem}
 
 Cette première section nous a donc montré l'importance du choix de l'algorithme dans les opérations sur les polynômes.
 
+\newpage
 
 \section{ALGORITHMES DE COMPOSITION MODULAIRE}
 
 L'enjeu de la composition modulaire est que nous n'arrivons pas à obtenir une complexité quasi linéaire.
-Dans cette autre section du rapport, nous nous intéressons donc à l'étude et la comparaison de trois algorithmes de composition modulaire qui calculent g(a) mod f avec 
+Dans cette autre section du rapport, nous nous intéressons donc à l'étude et la comparaison de trois algorithmes qui calculent $g(a)$ mod $f$ avec 
 $f \in \mathbb{Z}/p\mathbb{Z}[x]$ de degré $n$, $a \in \mathbb{Z}/p\mathbb{Z}[x]$ de degré au plus $n$ et $g \in \mathbb{Z}/p\mathbb{Z}[y]$ de degré au plus $n$.
 
 
 
 \subsection{Algorithme naïf}
 
-L'algorithme naïf de composition modulaire consiste à directement évaluer g en a et à retourner le résultat en le réduisant par f :
+L'algorithme naïf de composition modulaire consiste à directement évaluer $g$ en $a$ et à retourner le résultat en le réduisant par f :
 \[
 g(a)\text{ mod }f = \left(\sum_{k=0}^n g_k \cdot a^k\right) \text{ mod }f    
 \]
@@ -316,7 +315,7 @@ def eval_naive(g, a, f) :
 
 \subsubsection*{Complexité}
 \begin{itemize}
-    \item Pour $i \in \{0,...,n\}$, le degré des $a_i$ est au plus égal à $i(n-1)$ donc, le produit $a_i=a_{i-1}\cdot a$ est en $\tilde{O}(in)$ (ref th)
+    \item Pour $i \in \{0,...,n\}$, le degré des $a_i$ est au plus égal à $i(n-1)$ donc, le produit $a_i=a_{i-1}\cdot a$ est en $\tilde{O}(in)$ (cf. Theorem 1)
     \item Nous effectuons $n$ tours de boucles donc $n$ multiplications
 \end{itemize}
 La complexité de l'algotihme naïf est :
@@ -325,6 +324,8 @@ La complexité de l'algotihme naïf est :
 \]
 
 \subsection{Algorithme d'Horner}
+
+\cite{boldo:hal-02102015}
 
 \[
 g(a)\text{ mod }f = ((...((((g_{n-1}\cdot a)\text{ mod }f\ +\ g_{n-2})\cdot a)\text{ mod }f\ +\ g_{n-3})...)\cdot a)\text{ mod }f\ +\ g_0
@@ -351,7 +352,7 @@ La complexité de l'algorithme d'Horner est :
 \subsection{Algorithme de Brent et Kung}
 
 L'avancée de Brent et Kung a été de considérer le produit bien connu de deux matrices à coefficients constants $\omega$.
-
+\cite{BrentKung1978}
 
 Soit $\delta = \sqrt{n}$. Nous écrivons $g$ sous la forme de :
 \begin{align*}
@@ -469,9 +470,10 @@ def brentkung(g, a, f) :
 
 Dans notre rapport, nous avons choisi $ r = s = \delta = \sqrt{n}$ afin de simplifier la notation de la complexité.
 
+\newpage
 \subsubsection*{Complexité}
 \begin{itemize}
-    \item Pour $i \in \{0,...,\delta\}$, le degré de $a_i$ mod $f$ est au plus égal à $n$ donc, le produit $a_i=a_{i-1}\cdot a$ est en $\tilde{O}(n)$ (ref th)
+    \item Pour $i \in \{0,...,\delta\}$, le degré de $a_i$ mod $f$ est au plus égal à $n$ donc, le produit $a_i=a_{i-1}\cdot a$ est en $\tilde{O}(n)$ (cf. Theorem 1)
     \item La matrice des coefficients constants de $a$ est implicitement découpée en $\sqrt{n}$ matrices carrées de dimension $\sqrt{n}$.
     Nous avons donc $\sqrt{n}$ produits de matrices en $$O(\sqrt{n}\cdot \sqrt{n}^{\omega})=O(n^{(\omega+1)/2})$$ 
     \item L'évaluation polynômiale d'Horner coûte $O(n\cdot \delta)=O(n^{3/2})$
@@ -481,7 +483,6 @@ La complexité de l'algorithme de Brent et Kung est donc donnée par :
 n < n^{3/2} < n^{(\omega+1)/2}= n^{1,9035} \Longrightarrow O(n^{1,9035})
 \]
 
-\newpage
 
 \subsection{Comparaisons}
 \begin{multicols}{2}
@@ -502,6 +503,7 @@ n < n^{3/2} < n^{(\omega+1)/2}= n^{1,9035} \Longrightarrow O(n^{1,9035})
 L'algorithme de Nüsken et Ziegler est une généralisation de celui de Brent et Kung aux polynômes à deux variables. 
 Son principe est donc similaire, en différant au niveau de la matrice des coefficients de $g$ qui ici, contient des polynomes en $x$.
 Nous y retrouvons toutefois les mêmes étapes de calcul.
+\cite{NuskenZiegler2004}
 
 \[
 g(x,y) = \sum_{i,j<\delta}g_{i+\delta j}(x)y^{i+\delta j} = \sum_{j<\delta} \left( \sum_{i<\delta} g_{i+\delta j}(x)y^i \right) y^{\delta j}     
@@ -562,9 +564,10 @@ def nuskenziegler(g, a, f) :
     return res
 \end{lstlisting}
 
+\newpage
 \subsubsection*{Complexité}
 \begin{itemize}
-    \item Pour $i \in \{0,...,\delta\}$, le degré de $a_i$ mod $f$ est au plus égal à $n$ donc, le produit $a_i=a_{i-1}\cdot a$ est en $\tilde{O}(n)$
+    \item Pour $i \in \{0,...,\delta\}$, le degré de $a_i$ mod $f$ est au plus égal à $n$ donc, le produit $a_i=a_{i-1}\cdot a$ est en $\tilde{O}(n)$ (cf. Theorem 1)
     \item Soit $d$ le degré de la variable $x$, on a $\sqrt{n}$ de produits de matrice pour la variable $y$ et $d$ produits de matrice pour la variable $x$
     Nous avons donc $\sqrt{n} + d$ produits de matrices en $$O((\sqrt{n}+d)\cdot \sqrt{n}^{\omega})=O(n^{(\omega+1)/2} + n^{(\omega/2)}\cdot d)$$ 
     \item L'évaluation polynômiale d'Horner coûte $O(n\cdot \delta)=O(n^{3/2})$
@@ -578,7 +581,7 @@ Donc si le degré de $d<\sqrt{n}$, on se ramène à la même complexité que Bre
 n^{(\omega+1)/2} + n^{(\omega/2)}\cdot d < 2\times{n}^{(\omega+1)/2} = 2\times{n}^{1,9035} \Longrightarrow O(n^{1,9035})
 \]
 
-\bigskip
+\newpage
 \section{BIBLIOGRAPHIE}
 
 \nocite{*}

@@ -8,14 +8,18 @@
 \usepackage{algorithm, algorithmic}
 \usepackage{listings}
 \usepackage{graphicx}
-\usepackage{color}
 \usepackage[export]{adjustbox}
+\usepackage{xcolor} 
 
 
 \usetheme{Darmstadt}
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{blocks}[]
 \usefonttheme[onlymath]{serif}
+
+\xdefinecolor{mygreen}{RGB}{14,101,75}
+\xdefinecolor{myred}{RGB}{140,23,19} 
+\xdefinecolor{myblue}{RGB}{10,47,133} 
 
 \institute{Sorbonne Université}
 \title[Center text]{\textbf{Composition modulaire des polynômes à une variable}}
@@ -35,9 +39,17 @@
 
 \section{Introduction}
 \begin{frame}{Introduction}
+    Objectifs :
+    \begin{itemize}
+        \item Apprendre à manipuler les polynômes dans le corps ${\mathbb{Z}/p \mathbb{Z}}$.
+        \item Etudier et implémenter dans 3 langages différents les algorithmes existants du plus naïf au meilleur connu à ce jour.
+        \item Comprendre les complexités et l'efficacité de ces algorithmes. 
+        \item Comparer ces perfomances et leurs utilisations en pratique.
+    \end{itemize}
+
     Environnement :
     \begin{itemize}
-        \item Corps d'étude : $\mathbb{Z}/p\mathbb{Z} := \{k | k\in\{0, ..., p-1\}\}$
+        \item Corps d'étude : $\mathbb{Z}/p\mathbb{Z} := \{0, ..., p-1\}$
         \item Implantation : Sagemath (Python), Flint (C) et NTL (C++)  
     \end{itemize}
 
@@ -49,6 +61,7 @@
     Notations  :
     \begin{itemize}
         \item $\tilde{O}$
+        \item $\omega$
     \end{itemize}
 \end{frame}
 
@@ -75,9 +88,9 @@
     \textbf{Algorithme de Karatsuba} \\
     Soit $k= \lceil n/2 \rceil$
     \begin{align*}
-        (f \cdot g)(x) &= \textcolor{blue}{F^{(0)} \cdot G^{(0)}}\\
-            &+\left( \textcolor{green}{(F^{(0)}+F^{(1)}) \cdot (G^{(0)} + G^{(1)})} - \textcolor{blue}{F^{(0)} \cdot G^{(0)}} - \textcolor{red}{F^{(1)} \cdot G^{(1)}} \right)x^k\\
-            &+ (\textcolor{red}{F^{(1)} \cdot G^{(1)}}) \cdot x^{2k} 
+        (f \cdot g)(x) &= \textcolor{myblue}{F^{(0)} \cdot G^{(0)}}\\
+            &+\left( \textcolor{mygreen}{(F^{(0)}+F^{(1)}) \cdot (G^{(0)} + G^{(1)})} - \textcolor{myblue}{F^{(0)} \cdot G^{(0)}} - \textcolor{myred}{F^{(1)} \cdot G^{(1)}} \right)x^k\\
+            &+ (\textcolor{myred}{F^{(1)} \cdot G^{(1)}}) \cdot x^{2k} 
     \end{align*}
 
     \begin{alertblock}{Complexité}
@@ -121,6 +134,7 @@
                                           &+ ... \\
                                           &+ y^{\delta(\delta-1)}(g_{\delta(\delta-1)} + g_{\delta(\delta-1)+1}y + ... + g_{\delta^2-1}y^{\delta-1}) 
     \end{align*}
+    \pause
     \[
     g(y) = 
     \begin{pmatrix}
@@ -142,7 +156,6 @@
         y^{\delta-1}
     \end{pmatrix}
     \]
-    
     \[
         \begin{pmatrix}
             1 \\
@@ -191,7 +204,7 @@
         1 \\
         x \\
         \vdots \\
-        x^{\delta-1}
+        x^{n-1}
     \end{pmatrix}
     \]
     \rule{\linewidth}{0.2mm}\\[0.5cm]
@@ -202,7 +215,7 @@
         \item Retourne $horner(B_i, a^{\delta}, f)$ : $\tilde{O}(n^{3/2})$
     \end{itemize}
     \begin{alertblock}{Complexité}
-        L'algorithme de Brent et Kung est en $O(n^{\omega/2}(n+1))$
+        L'algorithme de Brent et Kung est en $O(n^{(\omega+1)/2})=O(n^{1,9035})$
     \end{alertblock}
 \end{frame}
 
@@ -224,7 +237,7 @@
 \section{Algorithme de Nüsken et Ziegler}
 \begin{frame}{Algorithme de Nüsken et Ziegler}
     \begin{block}{Nusken et Ziegler}
-        \textbf{Input :} $f \in \mathbb{Z}/p\mathbb{Z}[X]$ de degré $n$, $g \in \mathbb{Z}/p\mathbb{Z}[x,y]$ de degré $n$ $a \in \mathbb{Z}/p\mathbb{Z}[X]$ de degré au plus $n-1$. \\
+        \textbf{Input :} $f \in \mathbb{Z}/p\mathbb{Z}[X]$ de degré $n$, $g \in \mathbb{Z}/p\mathbb{Z}[x,y]$ de degré $d_x=d$ et $d_y$ au plus $n$, $a \in \mathbb{Z}/p\mathbb{Z}[X]$ de degré au plus $n-1$. \\
         \textbf{Output :} g(a) mod f
     \end{block}
 
@@ -265,10 +278,13 @@
         \item Calcule et retourne $horner(B_i, a^{\delta}, f)$
     \end{itemize}
     \begin{alertblock}{Complexité}
-        L'algorithme de Nusken et Ziegler est en $O(d_yM(d_x) + d_yM(n))$
+        L'algorithme de Nusken et Ziegler est en $O(n^{(\omega+1)/2} + n^{\omega/2}\cdot d_x)$
     \end{alertblock}
 \end{frame}
 
 \section{Conclusion}
+\begin{frame}{Conclusion}
+
+\end{frame}
 
 \end{document}
