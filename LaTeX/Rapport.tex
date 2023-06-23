@@ -116,7 +116,7 @@ L'étude de notre projet se base spécialement sur les calculs arithmétiques de
 \subsection{Choix d'implantation}
 
 \begin{itemize}
-    \item SageMath : Logiciel open source mathématique.
+    \item SageMath : Logiciel open source de mathématiques utilisant le langage Python.
     \item FLINT (Fast LIbrary for Number Theory) : Bibliothèque C fournissant des opérations arithmétiques sur les anneaux standards.
     \item NTL (Number Theory Library) : Bibliothèque C++ fournissant structures de données et algorithmes sur les entiers et les corps finis.
 \end{itemize}
@@ -138,8 +138,9 @@ Ainsi, plusieurs outils sont utilisés comme la division euclidienne, le calcul 
 
 \paragraph{Corps d'étude} :
 
-${\mathbb{Z}/p \mathbb{Z}}[x] := \{\text{polynômes univariés à coefficients entiers dans }\{0,...,p-1\}\}$ où $p$ est un nombre premier tenant dans un mot machine (i.e. 64 bits ?). \\
-Nous avons fait ce choix pour obtenir un contexte exacte. Cela s'oppose à un contexte numérique, que nous rencontrons avec les corps $\mathbb{Q}$ et $\mathbb{R}$ par exemples, qui obligent une représentation bornée par un nombre de bits finis.	
+${\mathbb{Z}/p \mathbb{Z}}[x] := \{\text{polynômes univariés à coefficients entiers dans }\{0,...,p-1\}\}$ où $p$ est un nombre premier tenant dans un mot machine (i.e. 64 bits et en pratique limité à 60 ou 62 dans FLINT/NTL pour des raisons techniques). \\
+Nous avons fait ce choix pour obtenir un contexte exacte et facilement représentable en machine. 
+Cela s'oppose à un contexte numérique, que nous rencontrons avec les corps $\mathbb{C}$ et $\mathbb{R}$ par exemples, qui obligent une représentation bornée par un nombre de bits finis.	
 
 \paragraph{Division euclidienne} :
 
@@ -155,7 +156,8 @@ Dans ce projet, elle nous a servi à réduire le degré des polynômes manipulé
 \subsubsection*{Notations}
 \begin{itemize}
     \item $\tilde{O}$ : cache les facteurs logarithmiques dans la complexité des algorithmes (\textit{ie.} $\tilde{O}(c)$ = $O(c\cdot log^{k}(c))$ pour $k>0$)
-    \item $\omega$ : c'est le plus petit nombre réel tels que deux matrices carrées de taille $n$ peuvent être multipliées. Pour notre étude, nous avons choisi la valeur donnée par V.Strassen soit $$\omega=2.807$$
+    \item $\omega$ : c'est le plus petit nombre réel tels que deux matrices carrées de taille $n$ peuvent être multipliées sur un corps \cite{STRASSEN1969}. 
+    Pour notre étude, nous avons choisi la valeur donnée par V.Strassen soit $$\omega=2.807$$
     La multiplication de deux matrices carrées de taille $n$ se fait donc en $$O(n^\omega)=O(n^{2.807})$$
     \item Les graphes de comparaison correspondent à la mesure, en fonction du temps en secondes, des algorithmes avec $n$ le plus haut degré des polynômes donnés en paramètres.
 \end{itemize}
@@ -257,8 +259,8 @@ def karatsuba(f, g) :
 \begin{itemize}
     \item Calcul récursif 3 multiplications de polynômes de degré au plus $k-1$
     \item Soit $C_n$ le nombre de tests effectués avant l'appel de la fonction multiplication naive:
-    $$C_n = 3\times{C_{\lceil n/2 \rceil}} + 1 = 3\times{C_{2^{k-1}}} + 1 \text{ avec } k = log_2(n) \text{ ... }$$
-    $$\Longrightarrow C_n = \dfrac{3^{k+1} - 1}{2} = \dfrac{3\times{3}^{log_2(n)} - 1}{2} = \dfrac{3\times{n}^{log_2(3)} - 1}{2} $$
+    $$C_n = 3\cdot {C_{\lceil n/2 \rceil}} + 1 = 3\cdot {C_{2^{k-1}}} + 1 \text{ avec } k = log_2(n)$$
+    $$\Longrightarrow C_n = \dfrac{3^{k+1} - 1}{2} = \dfrac{3\cdot {3}^{log_2(n)} - 1}{2} = \dfrac{3\cdot{n}^{log_2(3)} - 1}{2} $$
     
 \end{itemize}
 L'algorithme de Karatsuba est en $O(n^{log_2(3)}) \approx O(n^{1,59})$
@@ -268,11 +270,13 @@ L'algorithme de Karatsuba est en $O(n^{log_2(3)}) \approx O(n^{1,59})$
 \includegraphics[scale=0.5, center]{multi.png}
 \textit{
 \begin{itemize}
-    \item Le graphe ci-dessus nous montre l'allure cubique de la courbe de l'algorithme naif qui a une complexité moins optimale que celui de Karatsuba qui présente une allure quadratique. Cependant, la version déjà implémenté sur sagemath reste nettement la plus performante.
+    \item Le graphe ci-dessus nous montre l'allure cubique de la courbe de l'algorithme naif qui a une complexité moins optimale que celui de Karatsuba qui présente une allure quadratique. 
+    Cependant, la version déjà implémenté sur SageMath reste nettement la plus performante.
 \end{itemize}
 }
 
-Le produit effectué par SageMath utilise un algorithme à base de FFT.
+
+Le produit effectué par SageMath utilise un algorithme à base de FFT (Fast Fourier Transformation) implanté de manière optimisée dans un langage bas niveau.
 
 
 \begin{Theorem}
@@ -286,7 +290,8 @@ Cette première section nous a donc montré l'importance du choix de l'algorithm
 
 \section{ALGORITHMES DE COMPOSITION MODULAIRE}
 
-L'enjeu de la composition modulaire est que nous n'arrivons pas à obtenir une complexité quasi linéaire.
+La composition modulaire est une opération qui intervient dans d'autres opérations sur les polynômes telle que la factorisation (que nous n'étudierons pas dans ce projet).
+
 Dans cette autre section du rapport, nous nous intéressons donc à l'étude et la comparaison de trois algorithmes qui calculent $g(a)$ mod $f$ avec 
 $f \in \mathbb{Z}/p\mathbb{Z}[x]$ de degré $n$, $a \in \mathbb{Z}/p\mathbb{Z}[x]$ de degré au plus $n$ et $g \in \mathbb{Z}/p\mathbb{Z}[y]$ de degré au plus $n$.
 
@@ -351,7 +356,7 @@ La complexité de l'algorithme d'Horner est :
 
 \subsection{Algorithme de Brent et Kung}
 
-L'avancée de Brent et Kung a été de considérer le produit bien connu de deux matrices à coefficients constants $\omega$.
+L'avancée de Brent et Kung a été de considérer le produit bien connu de deux matrices à coefficients constants.
 \cite{BrentKung1978}
 
 Soit $\delta = \sqrt{n}$. Nous écrivons $g$ sous la forme de :
