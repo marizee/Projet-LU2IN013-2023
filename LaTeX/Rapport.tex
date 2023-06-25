@@ -42,6 +42,7 @@
     backgroundcolor=\color{gray},
     language=Python,
     keywordstyle=\color{red},
+    commentstyle=\color{mygreen},
     breaklines=true,
     frame=leftline,
     tabsize=4,
@@ -183,10 +184,12 @@ Ce premier algorithme consiste à simplement développer le produit des coeffici
 \]
 
 \begin{lstlisting}[title={multiplication naive}]
-    def mult_naive(f, g) :
-    ring = f.parent()
+def mult_naive(f, g) :
+    #la fonction parent() retourne le corps sur lequel est defini le polynome
+    ring = f.parent() 
 
     #initialisation de la liste des coefficients
+        #la fonction degree() retourne le degré du polynome
     res = [0]*(f.degree()+g.degree()+1) 
     
     for i in range(0, f.degree()+1):
@@ -236,6 +239,7 @@ def karatsuba(f, g) :
     ring = f.parent()
 
     #cas de base
+    #la fonction is_zero() renvoie True si le polynome est nul
     if f.is_zero() : return f
     if g.is_zero() : return g
     
@@ -255,6 +259,7 @@ def karatsuba(f, g) :
     h5 = karatsuba(f0+f1, g0+g1)
     h7 = h5 - h1 - h2
 
+    #la fonction shift(x) evalue le polynome en x
     h = h1 + h7.shift(k) + h2.shift(2*k)
 
     return h
@@ -594,8 +599,23 @@ La complexité de l'algorithme de Nusken et Ziegler est donné par:
 \]
 Donc si le degré de $d<\sqrt{n}$, on se ramène à la même complexité que Brent et kung
 \[
-n^{(\omega+1)/2} + n^{(\omega/2)}\cdot d < 2\times{n}^{(\omega+1)/2} = 2\times{n}^{1,9035} \Longrightarrow O(n^{1,9035})
+n^{(\omega+1)/2} + n^{(\omega/2)}\cdot d < 2\cdot {n}^{(\omega+1)/2} = 2\cdot {n}^{1,9035} \Longrightarrow O(n^{1,9035})
 \]
+
+
+\section{CONCLUSION}
+
+En résumé, les polynômes univariés sont des objets essentiels en mathématiques appliquées. Leur manipulation requiert donc des algorithmes performants pour 
+des instances de petite comme de très grande taille.
+
+Aujourd'hui, l'opération de composition modulaire des polynômes à une variable n'est pas perfomante dans tous les logiciels et bibliothèques (SageMath) malgré son importance dans d'autres opérations sur les polynômes.
+
+De même, la généralisation de la composition modulaire à $g$ bivarié avec l'algorithme de Nüsken et Ziegler n'était pas encore implémanté dans la bibliothèque NTL. Pour aller plus loin, nous avons donc essayé une première implantation.
+
+
+
+
+
 
 \newpage
 \section{BIBLIOGRAPHIE}
