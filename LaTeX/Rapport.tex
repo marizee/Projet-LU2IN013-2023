@@ -16,6 +16,8 @@
 \usepackage{lastpage}
 \usepackage[dvipsnames]{xcolor} 
 \usepackage[standard]{ntheorem}
+\usepackage{hyperref}
+
 
 \fancyhead[L, C, R]{}
 \fancyfoot[L, R]{}
@@ -139,7 +141,8 @@ Ainsi, plusieurs outils sont utilisés comme la division euclidienne, le calcul 
 \paragraph{Corps d'étude} :
 
 ${\mathbb{Z}/p \mathbb{Z}}[x] := \{\text{polynômes univariés à coefficients entiers dans }\{0,...,p-1\}\}$ où $p$ est un nombre premier tenant dans un mot machine (i.e. 64 bits et en pratique limité à 60 ou 62 dans FLINT/NTL pour des raisons techniques). \\
-Nous avons fait ce choix pour obtenir un contexte exacte et facilement représentable en machine. 
+
+Nous avons fait ce choix pour obtenir un contexte exact et facilement représentable en machine. 
 Cela s'oppose à un contexte numérique, que nous rencontrons avec les corps $\mathbb{C}$ et $\mathbb{R}$ par exemples, qui obligent une représentation bornée par un nombre de bits finis.	
 
 \paragraph{Division euclidienne} :
@@ -174,7 +177,7 @@ f(x)=f_0+f_1x+...+f_{n-1}x^{n-1}\text{ et }g(x)=g_0+g_1x+...+g_{n-1}x^{n-1}
 
 \subsection{Algorithme naif}
 
-Ce premier algorithme consiste à simplement développer le produit des coefficients :
+Ce premier algorithme consiste à simplement développer le produit des coefficients selon le principe de la distributivité qui est bien définie sur le corps $\mathbb{Z}/p\mathbb{Z}$ :
 \[
 (f\cdot g)(x)=(f_0+f_1x+...+f_{n-1}x^{n-1})\cdot (g_0+g_1x+...+g_{n-1}x^{n-1})=\sum_{i=0}^{2n-2} (\sum_{j+k=i}f_j\cdot g_k) x^i
 \]
@@ -195,9 +198,9 @@ Ce premier algorithme consiste à simplement développer le produit des coeffici
 
 \subsubsection*{Complexité}
 \begin{itemize} 
-    \item $f$ et $g$ sont de degré au plus $n$, ils ont donc chacun au plus $n$ coefficients
+    \item $f$ et $g$ sont de degré au plus $n-1$, ils ont donc chacun au plus $n$ coefficients
 \end{itemize}
-L'algorithme naïf est en $$(n-1)\cdot (n-1) = n^2 - 2n + 1 \Longrightarrow O(n^2)$$
+L'algorithme naïf est en $$n\cdot n = n^2 \Longrightarrow O(n^2)$$
 
 \subsection{Algorithme de Karatsuba}
 
@@ -205,7 +208,9 @@ L'amélioration proposée par Karatsuba repose sur le fait de scinder les polyno
 \[
 f(x)=f^{(0)}+f^{(1)}x^k\text{ et }g(x) = g^{(0)}+g^{(1)}x^k
 \]
-avec $f^{(0)}, f^{(1)}, g^{(0)}, g^{(1)}$ de degré au plus $k-1$ et $k=\lceil n/2 \rceil$. \\
+avec $f^{(0)}, f^{(1)}, g^{(0)}, g^{(1)}$ de degré au plus $k-1$ et $k=\lceil n/2 \rceil$.
+\cite{aecf-2017-livre}
+
 
 Le produit s'écrit alors :
 \[
@@ -219,7 +224,7 @@ Notons qu'en développant le produit \textcolor{mygreen}{vert}, nous retombons s
 (f\cdot g)(x) &= \textcolor{myred}{(f^{(0)}\cdot g^{(0)})}
         +\textcolor{mygreen}{(f^{(0)}\cdot g^{(1)}+f^{(1)}\cdot g^{(0)})}x^k
         +\textcolor{myblue}{(f^{(1)}\cdot g^{(1)})}x^{2k} \\
-        &= (f^{(0)}+f^{(1)}x^k) \cdot (g^{(0)}+g^{(1)})x^k
+        &= (f^{(0)}+f^{(1)}x^k) \cdot (g^{(0)}+g^{(1)}x^k)
 \end{align*}
 
 Cela permet de mettre en valeur que, dans l'opération en vert, l'algorithme naïf possède une addition et deux multiplications tandis que la formule proposée par Karatsuba 
@@ -257,8 +262,7 @@ def karatsuba(f, g) :
 
 \subsubsection*{Complexité}
 \begin{itemize}
-    \item Calcul récursif 3 multiplications de polynômes de degré au plus $k-1$
-    \item Soit $C_n$ le nombre de tests effectués avant l'appel de la fonction multiplication naive:
+    \item Soit $C_n$ le nombre de tests effectués avant l'appel récursif de la fonction multiplication naive:
     $$C_n = 3\cdot {C_{\lceil n/2 \rceil}} + 1 = 3\cdot {C_{2^{k-1}}} + 1 \text{ avec } k = log_2(n)$$
     $$\Longrightarrow C_n = \dfrac{3^{k+1} - 1}{2} = \dfrac{3\cdot {3}^{log_2(n)} - 1}{2} = \dfrac{3\cdot{n}^{log_2(3)} - 1}{2} $$
     
@@ -268,14 +272,13 @@ L'algorithme de Karatsuba est en $O(n^{log_2(3)}) \approx O(n^{1,59})$
 \subsection{Comparaisons}
 
 \includegraphics[scale=0.5, center]{multi.png}
+
 \textit{
-\begin{itemize}
-    \item Le graphe ci-dessus nous montre l'allure cubique de la courbe de l'algorithme naif qui a une complexité moins optimale que celui de Karatsuba qui présente une allure quadratique. 
-    Cependant, la version déjà implémenté sur SageMath reste nettement la plus performante.
-\end{itemize}
+Le graphe ci-dessus nous montre l'allure cubique de la courbe de l'algorithme naif qui a une complexité moins optimale que celui de Karatsuba qui présente une allure quadratique. 
+Cependant, la version déjà implémenté sur SageMath reste nettement la plus performante.
 }
 
-
+\bigskip
 Le produit effectué par SageMath utilise un algorithme à base de FFT (Fast Fourier Transformation) implanté de manière optimisée dans un langage bas niveau.
 
 
@@ -292,7 +295,7 @@ Cette première section nous a donc montré l'importance du choix de l'algorithm
 
 La composition modulaire est une opération qui intervient dans d'autres opérations sur les polynômes telle que la factorisation (que nous n'étudierons pas dans ce projet).
 
-Dans cette autre section du rapport, nous nous intéressons donc à l'étude et la comparaison de trois algorithmes qui calculent $g(a)$ mod $f$ avec 
+Dans cette autre section du rapport, nous nous intéressons donc à l'étude et à la comparaison de trois algorithmes qui calculent $g(a)$ mod $f$ avec 
 $f \in \mathbb{Z}/p\mathbb{Z}[x]$ de degré $n$, $a \in \mathbb{Z}/p\mathbb{Z}[x]$ de degré au plus $n$ et $g \in \mathbb{Z}/p\mathbb{Z}[y]$ de degré au plus $n$.
 
 
@@ -320,7 +323,7 @@ def eval_naive(g, a, f) :
 
 \subsubsection*{Complexité}
 \begin{itemize}
-    \item Pour $i \in \{0,...,n\}$, le degré des $a_i$ est au plus égal à $i(n-1)$ donc, le produit $a_i=a_{i-1}\cdot a$ est en $\tilde{O}(in)$ (cf. Theorem 1)
+    \item Pour $i \in \{0,...,n\}$, le degré des $a^i$ est au plus égal à $i(n-1)$ donc, le produit $a^i=a^{i-1}\cdot a$ est en $\tilde{O}(in)$ (cf. Theorem 1)
     \item Nous effectuons $n$ tours de boucles donc $n$ multiplications
 \end{itemize}
 La complexité de l'algotihme naïf est :
@@ -330,6 +333,8 @@ La complexité de l'algotihme naïf est :
 
 \subsection{Algorithme d'Horner}
 
+Pour l'algorithme d'Horner, il faut se souvenir, à chaque étape, de ce qui a été calculé à l'étape précédente. 
+De plus, réduire au fur et à mesure la taille du polynôme résultat permet de minimiser grandement le temps de calcul. 
 \cite{boldo:hal-02102015}
 
 \[
@@ -346,7 +351,7 @@ g(a)\text{ mod }f = ((...((((g_{n-1}\cdot a)\text{ mod }f\ +\ g_{n-2})\cdot a)\t
 
 \subsubsection*{Complexité}
 \begin{itemize}
-    \item Pour $i \in \{0,...,n\}$, le degré de $a_i$ mod $f$ est au plus égal à $n$ donc, le produit $a_i=a_{i-1}\cdot a$ est en $\tilde{O}(n)$ (ref th)
+    \item Pour $i \in \{0,...,n\}$, le degré de $res_i$ est au plus égal à $n$ donc, le produit $res_i=(res_{i-1}\cdot a)\text{ mod }f$ est en $\tilde{O}(n)$ (ref th)
     \item Nous effectuons $n$ tours de boucles donc $n$ multiplications
 \end{itemize}
 La complexité de l'algorithme d'Horner est :
@@ -496,12 +501,17 @@ n < n^{3/2} < n^{(\omega+1)/2}= n^{1,9035} \Longrightarrow O(n^{1,9035})
 
     \includegraphics[scale=0.4, center]{comp_2.png}
 \end{multicols}
-\textit{
-\begin{itemize}
-    \item Le premier graphe nous montre une vision plus large sur la différence entre les différents algorithmes. Bien vrai que l'algorithme de sagemath soit légèrement plus meilleur en complexité temporelle que celui du naif, on remarque une nette différence entre ces deux algorithmes qui sont de complexité cubique par rapport à ceux de Horner et Brent et Kung qui se rapprochent plus de l'ordre quadratique en complexité.
-    \item Le deuxième graphe nous permet de déduire pour des polynomes de degré assez grand que Brent et Kung reste l'algorithme avec la meilleur complexité pour la composition modulaire. Les pics dans le graphe relèvent de l'implémentation des algorithmes en sagemath qui peut générer des calculs implicites.
-\end{itemize}
-}
+
+\begin{multicols}{2}
+    \textit{Le premier graphe nous montre une nette différence entre le choix des algorithmes. 
+    Il est possible de distinguer les algorithmes de complexité cubique (SageMath et naïf) des algorithmes de complexité de l'ordre quadratique (Horner et Brent et Kung)}
+    \columnbreak
+
+    \textit{Le deuxième graphe permet de mettre en évidence l'amélioration non négligeable de Brent et Kung pour des degrés élevés.
+    Les pics dans le graphe peuvent être dus à des problèmes dans l'implémentation des algorithmes par SageMath.}
+\end{multicols}
+
+\newpage
 
 \section{ALGORITHME DE NUSKEN ET ZIEGLER}
 
@@ -513,8 +523,9 @@ Nous y retrouvons toutefois les mêmes étapes de calcul.
 \[
 g(x,y) = \sum_{i,j<\delta}g_{i+\delta j}(x)y^{i+\delta j} = \sum_{j<\delta} \left( \sum_{i<\delta} g_{i+\delta j}(x)y^i \right) y^{\delta j}     
 \]
+
+$g(x, a)\text{ mod }f =$
 \[
-g(x, a)\text{ mod }f =
 \begin{pmatrix}
     1 & y^\delta & ... & (y^\delta)^{\delta-1}  \\  
 \end{pmatrix}
@@ -591,10 +602,10 @@ n^{(\omega+1)/2} + n^{(\omega/2)}\cdot d < 2\times{n}^{(\omega+1)/2} = 2\times{n
 
 \nocite{*}
 
-\bibliographystyle{plain}
+\bibliographystyle{unsrt}
 \bibliography{biblio}
 
 \subsection*{Lien GitHub} 
-https://github.com/marizee/Projet-LU2IN013-2023
+\url{https://github.com/marizee/Projet-LU2IN013-2023}
 
 \end{document}

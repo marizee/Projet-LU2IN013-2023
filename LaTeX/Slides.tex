@@ -75,7 +75,7 @@
     \rule{\linewidth}{0.2mm}\\[0.5cm]
     \textbf{Algorithme naïf}
     \[
-    (f \cdot g)(x)=\sum_{i=0}^{2n-2} (\sum_{j+k=i}f_j \cdot g_k) \cdot x^i
+    (f \cdot g)(x)=\left(\sum_{i=0}^{n-1} f_ix^i\right)\cdot \left(\sum_{j=0}^{n-1} g_jx^j\right) = \sum_{i=0}^{2n-2} (\sum_{j+k=i}f_j \cdot g_k) x^i
     \]
 
     \begin{alertblock}{Complexité}
@@ -86,15 +86,20 @@
 
 \begin{frame}
     \textbf{Algorithme de Karatsuba} \\
-    Soit $k= \lceil n/2 \rceil$
+    Soit $k= \lceil n/2 \rceil$, $$ f(x)= F^{(0)}+F^{(1)}x^{k} \text{ et } g(x) = G^{(0)}+G^{(1)}x^{k}$$
     \begin{align*}
         (f \cdot g)(x) &= \textcolor{myblue}{F^{(0)} \cdot G^{(0)}}\\
             &+\left( \textcolor{mygreen}{(F^{(0)}+F^{(1)}) \cdot (G^{(0)} + G^{(1)})} - \textcolor{myblue}{F^{(0)} \cdot G^{(0)}} - \textcolor{myred}{F^{(1)} \cdot G^{(1)}} \right)x^k\\
-            &+ (\textcolor{myred}{F^{(1)} \cdot G^{(1)}}) \cdot x^{2k} 
+            &+ (\textcolor{myred}{F^{(1)} \cdot G^{(1)}}) x^{2k} 
     \end{align*}
+    \[
+    (f \cdot g)(x) = \textcolor{myblue}{F^{(0)} \cdot G^{(0)}}
+        +(\textcolor{mygreen}{(F^{(0)}\cdot G^{(0)})+(F^{(1)}\cdot G^{(1)})})x^k
+        +(\textcolor{myred}{F^{(1)} \cdot G^{(1)}}) x^{2k} 
+    \]
 
     \begin{alertblock}{Complexité}
-        L'algorithme de Karatsuba est en $O(n^{log_2(3)})$
+        L'algorithme de Karatsuba est en $O(n^{log_2(3)})\approx O(n^{1,59})$
     \end{alertblock}
 
 \end{frame}
@@ -109,7 +114,7 @@
 \section{Composition modulaire}
 \begin{frame}{Composition modulaire}
     \begin{block}{Composition modulaire}
-        \textbf{Input :} $f \in \mathbb{Z}/p\mathbb{Z}[x]$ de degré n, $g \in \mathbb{Z}/p\mathbb{Z}[y]$ de degré $n$ \\ $a \in \mathbb{Z}/p\mathbb{Z}[x]$ de degré au plus $n-1$. \\
+        \textbf{Input :} $f \in \mathbb{Z}/p\mathbb{Z}[x]$ de degré n, $g \in \mathbb{Z}/p\mathbb{Z}[y]$ de degré au plus $n$ \\ $a \in \mathbb{Z}/p\mathbb{Z}[x]$ de degré au plus $n-1$. \\
         \textbf{Output :} $g(a)\text{ mod }f$
     \end{block}
     \rule{\linewidth}{0.2mm}\\[0.5cm]
@@ -134,7 +139,6 @@
                                           &+ ... \\
                                           &+ y^{\delta(\delta-1)}(g_{\delta(\delta-1)} + g_{\delta(\delta-1)+1}y + ... + g_{\delta^2-1}y^{\delta-1}) 
     \end{align*}
-    \pause
     \[
     g(y) = 
     \begin{pmatrix}
@@ -157,25 +161,25 @@
     \end{pmatrix}
     \]
     \[
-        \begin{pmatrix}
-            1 \\
-            a \text{ mod }f\\
-            \vdots \\
-            a^{\delta-1} \text{ mod }f
-        \end{pmatrix}
-        =
-        \begin{pmatrix}
-            1 & 0 & ... & 0 \\
-            a_{1,0} & a_{1,1} & ... & a_{1,n-1} \\
-            \vdots & \vdots & ... & \vdots \\
-            a_{\delta-1,0} & a_{\delta-1,1} & ... & a_{\delta-1,n-1}
-        \end{pmatrix}
-        \begin{pmatrix}
-            1 \\
-            x \\
-            \vdots \\
-            x^{n-1}
-        \end{pmatrix}
+    \begin{pmatrix}
+        1 \\
+        a \text{ mod }f\\
+        \vdots \\
+        a^{\delta-1} \text{ mod }f
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        1 & 0 & ... & 0 \\
+        a_{1,0} & a_{1,1} & ... & a_{1,n-1} \\
+        \vdots & \vdots & ... & \vdots \\
+        a_{\delta-1,0} & a_{\delta-1,1} & ... & a_{\delta-1,n-1}
+    \end{pmatrix}
+    \begin{pmatrix}
+        1 \\
+        x \\
+        \vdots \\
+        x^{n-1}
+    \end{pmatrix}
     \]
 \end{frame}
 
@@ -237,37 +241,41 @@
 \section{Algorithme de Nüsken et Ziegler}
 \begin{frame}{Algorithme de Nüsken et Ziegler}
     \begin{block}{Nusken et Ziegler}
-        \textbf{Input :} $f \in \mathbb{Z}/p\mathbb{Z}[X]$ de degré $n$, $g \in \mathbb{Z}/p\mathbb{Z}[x,y]$ de degré $d_x=d$ et $d_y$ au plus $n$, $a \in \mathbb{Z}/p\mathbb{Z}[X]$ de degré au plus $n-1$. \\
+        \textbf{Input :} $f \in \mathbb{Z}/p\mathbb{Z}[X]$ de degré $n$, $g \in \mathbb{Z}/p\mathbb{Z}[x,y]$ de degré en $x$ $d_x=d$ et en $y$ $d_y$ au plus $n$, $a \in \mathbb{Z}/p\mathbb{Z}[X]$ de degré au plus $n-1$. \\
         \textbf{Output :} g(a) mod f
     \end{block}
 
     \[
     g(x,y) = \sum_{i,j<\delta}g_{i+\delta j}(x)y^{i+\delta j} = \sum_{j<\delta} \left( \sum_{i<\delta} g_{i+\delta j}(x)y^i \right) y^{\delta j}     
     \]
+    
+    $g(x, a)\text{ mod }f =$
     \[
     \begin{pmatrix}
-        B_0 \\
-        B_1 \\
+        1 \\
+        y^\delta \\
         \vdots \\
-        B_{\delta-1}
-    \end{pmatrix}
-    =
+        (y^\delta)^{\delta-1}  
+    \end{pmatrix}^t
     \begin{pmatrix}
-        g_0(x)&g_1(x)&...&g_{\delta -1}(x) \\
-        g_{\delta}(x)&g_{1+\delta}(x)&...&g_{2\delta-1}(x) \\
-        \vdots&\vdots&...&\vdots \\
-        g_{(\delta-1)\delta}(x)&g_{(\delta-1)\delta+1}(x)&...&g_{\delta^2-1}(x)
+        g_0(x) & ... & g_{\delta-1}(x) \\
+        g_{\delta}(x) & ... & g_{2\delta-1}(x) \\
+        \vdots & ... & \vdots \\
+        g_{\delta(\delta-1)}(x) & ... & g_{\delta^2-1}(x)
+    \end{pmatrix}
+    \begin{pmatrix}
+        1 &  ... & 0 \\
+        a_{1,0} & ... & a_{1,n-1} \\
+        \vdots &  ... & \vdots \\
+        a_{\delta-1,0} & ... & a_{\delta-1,n-1}
     \end{pmatrix}
     \begin{pmatrix}
         1 \\
-        a \\
-        a^2 \text{ mod }f \\
-        ... \\
-        a^{\delta-1} \text{ mod }f
+        x \\
+        \vdots \\
+        x^{n-1}
     \end{pmatrix}
     \]
-    
-
     
 \end{frame}
 
